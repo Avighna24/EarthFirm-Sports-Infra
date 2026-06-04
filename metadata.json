@@ -1,0 +1,6 @@
+{
+  "name": "Earthfirm Sports Infrastructures",
+  "description": "Premium Sports Infrastructure and Interactive Arena Customizer. Custom-design and estimate elite courts and smart turfs with our interactive builders.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
