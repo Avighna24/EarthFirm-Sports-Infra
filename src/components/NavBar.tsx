@@ -8,13 +8,18 @@ interface NavBarProps {
 }
 
 export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps) {
-  const currentPath = window.location.pathname;
+  const currentPath = window.location.hash ? window.location.hash.slice(1) : window.location.pathname;
 
   const handleNavClick = (elementId: string, path: string = '/') => {
-    if (currentPath !== path) {
+    const isTargetRoot = path === '/';
+    // If we're on root already (or we're routed there)
+    const isLocalRoot = currentPath === '/' || currentPath === '';
+    
+    if (isTargetRoot && !isLocalRoot) {
       onNavigateTo(path);
-      // Wait for page to load then scroll
       setTimeout(() => onScrollTo(elementId), 100);
+    } else if (!isTargetRoot && currentPath !== path) {
+      onNavigateTo(path);
     } else {
       onScrollTo(elementId);
     }
@@ -26,7 +31,7 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
         
         {/* Logo combined */}
         <div className="cursor-pointer flex items-center" data-testid="nav-logo" onClick={onNavigateHome}>
-          <img src="/Logo.png" alt="Earthfirm Sports Infra" className="h-[90px] w-auto object-contain" />
+          <img src="./Logo.png" alt="Earthfirm Sports Infra" className="h-[90px] w-auto object-contain" />
         </div>
 
         {/* Nav Links */}

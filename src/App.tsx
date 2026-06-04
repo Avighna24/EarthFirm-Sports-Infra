@@ -22,21 +22,48 @@ export default function App() {
   
   // Real-time SPA Path routing
   const [currentPath, setCurrentPath] = useState(() => {
-    return window.location.pathname;
+    if (window.location.hash) {
+      return window.location.hash.slice(1);
+    }
+    const path = window.location.pathname;
+    const base = (import.meta as any).env.BASE_URL || '/';
+    if (base !== '/' && path.startsWith(base)) {
+      return path.slice(base.length - 1);
+    }
+    return path;
   });
 
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      if (window.location.hash) {
+        setCurrentPath(window.location.hash.slice(1));
+      } else {
+        const path = window.location.pathname;
+        const base = (import.meta as any).env.BASE_URL || '/';
+        if (base !== '/' && path.startsWith(base)) {
+          setCurrentPath(path.slice(base.length - 1));
+        } else {
+          setCurrentPath(path);
+        }
+      }
+    };
+    const handleHashChange = () => {
+      if (window.location.hash) {
+        setCurrentPath(window.location.hash.slice(1));
+      }
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   const navigateTo = (path: string) => {
-    window.history.pushState({}, '', path);
+    window.location.hash = path;
     setCurrentPath(path);
-    if (path === '/') {
+    if (path === '/' || path === '') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -158,7 +185,7 @@ export default function App() {
             
             {/* Branding */}
             <div className="space-y-4">
-              <img src="/Logo.png" alt="Earthfirm Sports Infra" className="h-[120px] w-auto object-contain grayscale opacity-80 mix-blend-screen" />
+              <img src="./Logo.png" alt="Earthfirm Sports Infra" className="h-[120px] w-auto object-contain grayscale opacity-80 mix-blend-screen" />
               <p className="max-w-xs text-brand-cream/70 leading-relaxed text-xs">
                 We Build The Ground Work For Champions. High-performance civil basketball courts, tournament-grade cricket turf, ITF tennis systems, and bespoke sports arenas.
               </p>

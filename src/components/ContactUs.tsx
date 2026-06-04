@@ -15,7 +15,7 @@ export function ContactUs() {
             </p>
           </div>
           <div className="shrink-0 self-start">
-            <img src="/Logo.png" alt="Earthfirm Sports Infra" className="h-[174px] w-auto object-contain grayscale opacity-80 mix-blend-screen" />
+            <img src="./Logo.png" alt="Earthfirm Sports Infra" className="h-[174px] w-auto object-contain grayscale opacity-80 mix-blend-screen" />
           </div>
         </div>
 
