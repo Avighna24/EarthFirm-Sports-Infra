@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type SportType = 'BASKETBALL' | 'TENNIS' | 'PICKLEBALL' | 'FOOTBALL' | 'TRACK_FIELD' | 'GYM' | 'CRICKET' | 'BADMINTON';
+export type SportType = 'BASKETBALL' | 'TENNIS' | 'PICKLEBALL' | 'FOOTBALL' | 'TRACK_FIELD' | 'GYM' | 'CRICKET' | 'BADMINTON' | 'SWIMMING_POOL' | 'SQUASH' | 'VOLLEYBALL';
 
 export interface SportDetails {
   id: SportType;
@@ -17,7 +17,7 @@ export interface SportDetails {
   basePricePerSqFt: number;
 }
 
-export type SurfaceMaterialType = 'CANADIAN_MAPLE' | 'PRO_ACRYLIC' | 'PP_TILES' | 'COMPOSITE_TURF';
+export type SurfaceMaterialType = 'CANADIAN_MAPLE' | 'PRO_ACRYLIC' | 'PP_TILES' | 'COMPOSITE_TURF' | 'MOSAIC_CLASSIC' | 'GLASS_BEAD_PLASTER' | 'REINFORCED_PVC_LINER' | 'ARMOURCOAT_WALLS';
 
 export interface SurfaceMaterialDetails {
   id: SurfaceMaterialType;
@@ -39,7 +39,13 @@ export interface SmartFeature {
   category: 'Tech' | 'Hardware' | 'Lighting' | 'Ecosystem';
 }
 
-export type SubbaseType = 'POST_TENSION_CONCRETE' | 'ASPHALT' | 'COMPACTED_STONE' | 'SUSPENDED_DECK';
+export type SubbaseType = 
+  | 'POST_TENSION_CONCRETE' | 'ASPHALT' | 'COMPACTED_STONE' | 'SUSPENDED_DECK'
+  | 'FOOTBALL_DRAINAGE_AGGREGATE' | 'FOOTBALL_SHOCKPAD_BASE'
+  | 'CRICKET_HEAVY_CLAY' | 'CRICKET_COMPACT_STONE'
+  | 'GYM_ACOUSTIC_SLAB' | 'GYM_RUBBER_DAMPENING'
+  | 'POOL_SHOTCRETE_SHELL' | 'POOL_POURED_CONCRETE'
+  | 'SQUASH_DOUBLE_BATTEN' | 'SQUASH_SINGLE_ELASTIC';
 
 export interface SubbaseDetails {
   id: SubbaseType;

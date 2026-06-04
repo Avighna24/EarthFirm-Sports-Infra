@@ -1,4 +1,14 @@
 import { Phone, Mail, MapPin, Clock, Globe } from 'lucide-react';
+import { motion } from 'motion/react';
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' }
+  }
+} as const;
 
 export function ContactUs() {
   return (
@@ -6,7 +16,7 @@ export function ContactUs() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mb-12">
+        <motion.div variants={staggerItem} className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mb-12">
           <div className="max-w-3xl">
             <span className="text-xs uppercase tracking-[0.2em] text-brand-sage font-mono font-bold block mb-2">OPERATIONAL INTEGRITY</span>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-white mb-4">Contact Our Corporate Office</h2>
@@ -17,12 +27,12 @@ export function ContactUs() {
           <div className="shrink-0 self-start">
             <img src="./Logo.png" alt="Earthfirm Sports Infra" className="h-[174px] w-auto object-contain grayscale opacity-80 mix-blend-screen" />
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left direct contact column (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
+          <motion.div variants={staggerItem} className="lg:col-span-5 space-y-6">
             
             <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-sm space-y-6">
               <div>
@@ -84,10 +94,10 @@ export function ContactUs() {
 
             </div>
 
-          </div>
+          </motion.div>
 
           {/* Right operational regions panel (7 cols) */}
-          <div className="lg:col-span-7 bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-6">
+          <motion.div variants={staggerItem} className="lg:col-span-7 bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-6">
             
             <div className="flex justify-between items-center border-b border-neutral-800 pb-4">
               <span className="text-xs font-mono font-bold uppercase text-neutral-500 tracking-wider">Indore Corporate Office</span>
@@ -151,7 +161,7 @@ export function ContactUs() {
 
             </div>
 
-          </div>
+          </motion.div>
 
         </div>
 

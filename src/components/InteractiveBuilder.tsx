@@ -4,12 +4,22 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { CourtConfiguration, SportType, SurfaceMaterialType, SubbaseType } from '../types';
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' }
+  }
+} as const;
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES, SMART_FEATURES, COLORS } from '../constants';
 import { CourtVisualizer } from './CourtVisualizer';
 import { CostEstimator } from './CostEstimator';
 import { TimelineTracker } from './TimelineTracker';
-import { Dribbble, Activity, Zap, Play, Flame, Check, Info, Hammer, Settings, ArrowDown, Dumbbell, Target, Trophy } from 'lucide-react';
+import { Dribbble, Activity, Zap, Play, Flame, Check, Info, Hammer, Settings, ArrowDown, Dumbbell, Target, Trophy, Waves, Layout, Volleyball } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 
 interface InteractiveBuilderProps {
@@ -24,6 +34,8 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
   const [sportType, setSportType] = useState<SportType>(config.sportType);
   const [length, setLength] = useState<number>(config.length);
   const [width, setWidth] = useState<number>(config.width);
+  const [visualLength, setVisualLength] = useState<number>(config.length);
+  const [visualWidth, setVisualWidth] = useState<number>(config.width);
   const [surfaceMaterial, setSurfaceMaterial] = useState<SurfaceMaterialType>(config.surfaceMaterial);
   const [primaryColor, setPrimaryColor] = useState<string>(config.primaryColor);
   const [secondaryColor, setSecondaryColor] = useState<string>(config.secondaryColor);
@@ -33,11 +45,32 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
   const [visualizePlayers, setVisualizePlayers] = useState<boolean>(config.visualizePlayers !== false);
   const [animatePlayers, setAnimatePlayers] = useState<boolean>(config.animatePlayers !== false);
 
+  // Debounce visual input changes to heavy canvas/price state updates (100ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualLength !== length) setLength(visualLength);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualLength, length]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualWidth !== width) setWidth(visualWidth);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualWidth, width]);
+
   // Sync state from parent's config prop (e.g. from Hero Showcase clicks or initialization)
   useEffect(() => {
     if (config.sportType !== sportType) setSportType(config.sportType);
-    if (config.length !== length) setLength(config.length);
-    if (config.width !== width) setWidth(config.width);
+    if (config.length !== length) {
+      setLength(config.length);
+      setVisualLength(config.length);
+    }
+    if (config.width !== width) {
+      setWidth(config.width);
+      setVisualWidth(config.width);
+    }
     if (config.surfaceMaterial !== surfaceMaterial) setSurfaceMaterial(config.surfaceMaterial);
     if (config.primaryColor !== primaryColor) setPrimaryColor(config.primaryColor);
     if (config.secondaryColor !== secondaryColor) setSecondaryColor(config.secondaryColor);
@@ -57,16 +90,27 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
     setSportType(type);
     const preset = SPORT_PRESETS[type];
     setLength(preset.defaultDimensions.length);
+    setVisualLength(preset.defaultDimensions.length);
     setWidth(preset.defaultDimensions.width);
+    setVisualWidth(preset.defaultDimensions.width);
 
     // Dynamic defaults for sports
     if (type === 'FOOTBALL') {
       setSurfaceMaterial('COMPOSITE_TURF');
-      setSubbase('COMPACTED_STONE');
+      setSubbase('FOOTBALL_DRAINAGE_AGGREGATE');
     } else if (type === 'CRICKET') {
       setSurfaceMaterial('COMPOSITE_TURF');
-      setSubbase('POST_TENSION_CONCRETE');
-    } else if (type === 'BASKETBALL' || type === 'GYM' || type === 'BADMINTON') {
+      setSubbase('CRICKET_COMPACT_STONE');
+    } else if (type === 'SWIMMING_POOL') {
+      setSurfaceMaterial('MOSAIC_CLASSIC');
+      setSubbase('POOL_SHOTCRETE_SHELL');
+    } else if (type === 'SQUASH') {
+      setSurfaceMaterial('CANADIAN_MAPLE');
+      setSubbase('SQUASH_DOUBLE_BATTEN');
+    } else if (type === 'GYM') {
+      setSurfaceMaterial('CANADIAN_MAPLE');
+      setSubbase('GYM_ACOUSTIC_SLAB');
+    } else if (type === 'BASKETBALL' || type === 'BADMINTON' || type === 'VOLLEYBALL') {
       setSurfaceMaterial('CANADIAN_MAPLE');
       setSubbase('POST_TENSION_CONCRETE');
     } else {
@@ -114,6 +158,9 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
       case 'GYM': return <Dumbbell className="h-5 w-5" />;
       case 'CRICKET': return <Target className="h-5 w-5" />;
       case 'BADMINTON': return <Trophy className="h-5 w-5" />;
+      case 'SWIMMING_POOL': return <Waves className="h-5 w-5" />;
+      case 'SQUASH': return <Layout className="h-5 w-5" />;
+      case 'VOLLEYBALL': return <Volleyball className="h-5 w-5" />;
     }
   };
 
@@ -124,7 +171,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Intro Header */}
-        <div className="max-w-3xl mb-12">
+        <motion.div variants={staggerItem} className="max-w-3xl mb-12">
           <span className="text-xs uppercase tracking-[0.2em] text-brand-sage font-mono font-bold block mb-2">Architectural Workspace</span>
           <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-brand-stone mb-4">
             {t('build.title')}
@@ -132,7 +179,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
           <p className="text-stone-650 text-sm sm:text-base leading-relaxed">
             {t('build.subtitle')}
           </p>
-        </div>
+        </motion.div>
 
         {/* Master Double Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -141,7 +188,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
           <div className="lg:col-span-7 space-y-10">
             
             {/* Step 1: Sport Selection */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm">
+            <motion.div variants={staggerItem} className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm">
               <label className="text-xs uppercase tracking-[0.15em] text-brand-sage font-mono font-bold block mb-4 border-b border-stone-100 pb-2">
                 01. Sport Arena Type
               </label>
@@ -177,10 +224,10 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   {currentSportPreset.description}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 2: Dimensions Sub-section */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm">
+            <motion.div variants={staggerItem} className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm">
               <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
                 <div>
                   <label className="text-xs uppercase tracking-[0.15em] text-brand-sage font-mono font-bold block mb-1">
@@ -190,7 +237,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 </div>
                 <div className="bg-brand-cream/75 px-4 py-2 rounded-2xl border border-stone-100/80 text-left sm:text-right">
                   <span className="text-[10px] font-mono text-brand-sage uppercase tracking-widest block font-bold">Total Footprint</span>
-                  <span className="text-sm font-mono font-bold text-brand-stone">{(length * width).toLocaleString()} sq. ft</span>
+                  <span className="text-sm font-mono font-bold text-brand-stone">{(visualLength * visualWidth).toLocaleString()} sq. ft</span>
                 </div>
               </div>
 
@@ -199,14 +246,14 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 <div>
                   <div className="flex justify-between text-xs font-mono text-stone-550 mb-2">
                     <span>Arena Length</span>
-                    <span className="text-brand-stone font-bold">{length} ft</span>
+                    <span className="text-brand-stone font-bold">{visualLength} ft</span>
                   </div>
                   <input
                     type="range"
                     min={currentSportPreset.minDimensions.length}
                     max={currentSportPreset.maxDimensions.length}
-                    value={length}
-                    onChange={(e) => setLength(parseInt(e.target.value))}
+                    value={visualLength}
+                    onChange={(e) => setVisualLength(parseInt(e.target.value))}
                     className="w-full h-1.5 rounded-lg appearance-none cursor-ew-resize bg-stone-200 accent-brand-sage"
                   />
                   <div className="flex justify-between text-[9px] font-mono text-stone-400 mt-1">
@@ -219,14 +266,14 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 <div>
                   <div className="flex justify-between text-xs font-mono text-stone-555 mb-2">
                     <span>Arena Width</span>
-                    <span className="text-brand-stone font-bold">{width} ft</span>
+                    <span className="text-brand-stone font-bold">{visualWidth} ft</span>
                   </div>
                   <input
                     type="range"
                     min={currentSportPreset.minDimensions.width}
                     max={currentSportPreset.maxDimensions.width}
-                    value={width}
-                    onChange={(e) => setWidth(parseInt(e.target.value))}
+                    value={visualWidth}
+                    onChange={(e) => setVisualWidth(parseInt(e.target.value))}
                     className="w-full h-1.5 rounded-lg appearance-none cursor-ew-resize bg-stone-200 accent-brand-sage"
                   />
                   <div className="flex justify-between text-[9px] font-mono text-stone-400 mt-1">
@@ -241,7 +288,9 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   <button
                     onClick={() => {
                       setLength(currentSportPreset.minDimensions.length);
+                      setVisualLength(currentSportPreset.minDimensions.length);
                       setWidth(currentSportPreset.minDimensions.width);
+                      setVisualWidth(currentSportPreset.minDimensions.width);
                     }}
                     id="btn-ratio-compact"
                     className="px-3 py-1.5 text-[10px] font-mono font-bold rounded-full bg-brand-cream hover:bg-stone-200/50 border border-stone-200 text-stone-605 transition cursor-pointer"
@@ -251,7 +300,9 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   <button
                     onClick={() => {
                       setLength(currentSportPreset.defaultDimensions.length);
+                      setVisualLength(currentSportPreset.defaultDimensions.length);
                       setWidth(currentSportPreset.defaultDimensions.width);
+                      setVisualWidth(currentSportPreset.defaultDimensions.width);
                     }}
                     id="btn-ratio-pro"
                     className="px-3 py-1.5 text-[10px] font-mono font-bold rounded-full bg-brand-sage-soft border border-brand-sage text-brand-sage transition cursor-pointer"
@@ -260,10 +311,10 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 3: Material & Color Architecture */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
+            <motion.div variants={staggerItem} className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
               <div>
                 <label className="text-xs uppercase tracking-[0.15em] text-brand-sage font-mono font-bold block mb-1">
                   03. Cushioned Surfaces & Colors
@@ -275,11 +326,15 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
               <div className="space-y-3">
                 {Object.values(SURFACE_MATERIALS).map((material) => {
                   const isSelected = surfaceMaterial === material.id;
-                  const isCompatible = sportType === 'FOOTBALL' 
-                    ? material.id === 'COMPOSITE_TURF' 
-                    : sportType === 'TRACK_FIELD' 
-                      ? material.id !== 'COMPOSITE_TURF' && material.id !== 'CANADIAN_MAPLE'
-                      : material.id !== 'COMPOSITE_TURF';
+                  const isCompatible = sportType === 'SWIMMING_POOL'
+                    ? ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(material.id)
+                    : sportType === 'SQUASH'
+                      ? ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(material.id)
+                      : sportType === 'FOOTBALL' 
+                        ? material.id === 'COMPOSITE_TURF' 
+                        : sportType === 'TRACK_FIELD' 
+                          ? !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id)
+                          : !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
 
                   return (
                     <button
@@ -373,10 +428,10 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 4: Foundation (Earthfirm Specialty) */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
+            <motion.div variants={staggerItem} className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
               <div>
                 <label className="text-xs uppercase tracking-[0.15em] text-brand-sage font-mono font-bold block mb-1">
                   04. Groundwork Sub-structures & Civil Foundations
@@ -385,7 +440,21 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {Object.values(SUB_BASES).map((sub) => {
+                {Object.values(SUB_BASES).filter((sub) => {
+                  if (sportType === 'FOOTBALL') {
+                    return ['FOOTBALL_DRAINAGE_AGGREGATE', 'FOOTBALL_SHOCKPAD_BASE'].includes(sub.id);
+                  } else if (sportType === 'CRICKET') {
+                    return ['CRICKET_HEAVY_CLAY', 'CRICKET_COMPACT_STONE'].includes(sub.id);
+                  } else if (sportType === 'GYM') {
+                    return ['GYM_ACOUSTIC_SLAB', 'GYM_RUBBER_DAMPENING'].includes(sub.id);
+                  } else if (sportType === 'SWIMMING_POOL') {
+                    return ['POOL_SHOTCRETE_SHELL', 'POOL_POURED_CONCRETE'].includes(sub.id);
+                  } else if (sportType === 'SQUASH') {
+                    return ['SQUASH_DOUBLE_BATTEN', 'SQUASH_SINGLE_ELASTIC'].includes(sub.id);
+                  } else {
+                    return ['POST_TENSION_CONCRETE', 'ASPHALT', 'COMPACTED_STONE', 'SUSPENDED_DECK'].includes(sub.id);
+                  }
+                }).map((sub) => {
                   const isSelected = subbase === sub.id;
                   return (
                     <button
@@ -412,10 +481,10 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 5: High-Tech Upgrades (Iconic Specialities) */}
-            <div className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
+            <motion.div variants={staggerItem} className="bg-white rounded-3xl border border-stone-200/60 p-6 sm:p-8 shadow-sm space-y-6">
               <div>
                 <label className="text-xs uppercase tracking-[0.15em] text-brand-sage font-mono font-bold block mb-1">
                   05. Iconic Smart Arena Upgrades & Equipment
@@ -453,12 +522,12 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
 
           </div>
 
           {/* RIGHT PANEL: STICKY LIVE SIMULATION & DETAILED FINANCIAL SPEC (lg:col-span-5) */}
-          <div className="lg:col-span-12 xl:col-span-5 lg:sticky lg:top-8 space-y-6">
+          <motion.div variants={staggerItem} className="lg:col-span-12 xl:col-span-5 lg:sticky lg:top-8 space-y-6">
             
             {/* Live simulation */}
             <div className="space-y-4">
@@ -531,7 +600,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
             >
               Get Cost Estimation in Budget Planner
             </button>
-          </div>
+          </motion.div>
 
         </div>
 

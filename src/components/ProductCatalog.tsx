@@ -4,7 +4,17 @@
  */
 
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { SURFACE_MATERIALS } from '../constants';
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' }
+  }
+} as const;
 import { SurfaceMaterialType } from '../types';
 import { Layers, Shield, Award, Calendar, HelpCircle, HardHat, Sparkles } from 'lucide-react';
 
@@ -19,7 +29,7 @@ export const ProductCatalog: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-12">
+        <motion.div variants={staggerItem} className="max-w-3xl mb-12">
           <span className="text-xs uppercase tracking-[0.2em] text-brand-sage font-mono font-bold block mb-2">Layer Engineering Laboratory</span>
           <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-brand-stone mb-4">
             Material Specs <span className="italic font-light text-brand-sage">&amp; Lab Portfolio</span>
@@ -27,10 +37,10 @@ export const ProductCatalog: React.FC = () => {
           <p className="text-stone-650 text-sm sm:text-base leading-relaxed">
             Elite sports performance starts deep beneath the finish line. We build fully engineered systems layer-by-layer with specialized shock pads, moisture shields, and organic polymer aggregate composites.
           </p>
-        </div>
+        </motion.div>
 
         {/* Tab Selection */}
-        <div className="flex flex-wrap gap-2 border-b border-stone-200 w-full mb-8">
+        <motion.div variants={staggerItem} className="flex flex-wrap gap-2 border-b border-stone-200 w-full mb-8">
           {Object.values(SURFACE_MATERIALS).map((mat) => {
             const isSelected = mat.id === activeMaterialId;
             return (
@@ -51,13 +61,13 @@ export const ProductCatalog: React.FC = () => {
               </button>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Dynamic Showcase Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           
           {/* LEFT COLUMN: SPEC AND SYSTEM DESCRIPTION (col-span-5) */}
-          <div className="lg:col-span-5 space-y-6 flex flex-col justify-between">
+          <motion.div variants={staggerItem} className="lg:col-span-5 space-y-6 flex flex-col justify-between">
             <div className="space-y-4 text-left">
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase ${
@@ -95,10 +105,10 @@ export const ProductCatalog: React.FC = () => {
                 <span className="text-xs font-bold text-brand-stone">5 - 12 Working Days</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* RIGHT COLUMN: INTERACTIVE LAYER EXPLODER GRID (col-span-7) */}
-          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/60 shadow-md flex flex-col justify-center">
+          <motion.div variants={staggerItem} className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/60 shadow-md flex flex-col justify-center">
             
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
@@ -156,7 +166,7 @@ export const ProductCatalog: React.FC = () => {
               )}
             </div>
 
-          </div>
+          </motion.div>
 
         </div>
 

@@ -13,9 +13,21 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { BudgetPlanner } from './components/BudgetPlanner';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
+import { FloatingActions } from './components/FloatingActions';
 import { CourtConfiguration } from './types';
 import { Landmark, Trophy, ShieldCheck, Zap, Info, ArrowUp, Sparkles, MapPin, Mail, Phone, Clock, Globe, Building } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.05
+    }
+  }
+};
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
@@ -89,6 +101,17 @@ export default function App() {
     }
   };
 
+  const handleScrollToContact = (elementId: string) => {
+    if (isPlanningPage || isFAQPage) {
+      navigateTo('/');
+      setTimeout(() => {
+        scrollSmoothTo(elementId);
+      }, 150);
+    } else {
+      scrollSmoothTo(elementId);
+    }
+  };
+
   // Check if current page is the Budget Planning page (pathname or custom parameter)
   const isPlanningPage = currentPath === '/budget-planning' || currentPath === '/budget-planning/';
   const isFAQPage = currentPath === '/faq' || currentPath === '/faq/';
@@ -98,6 +121,7 @@ export default function App() {
       <div className="flex flex-col min-h-screen font-sans">
         <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
         <BudgetPlanner onBackToMain={() => navigateTo('/')} language={language} />
+        <FloatingActions onScrollToContact={handleScrollToContact} />
       </div>
     );
   }
@@ -107,6 +131,7 @@ export default function App() {
       <div className="flex flex-col min-h-screen font-sans">
         <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
         <FAQ onBackToMain={() => navigateTo('/')} language={language} />
+        <FloatingActions onScrollToContact={handleScrollToContact} />
       </div>
     );
   }
@@ -136,20 +161,20 @@ export default function App() {
 
       {/* ABOUT US SECTION */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        variants={staggerContainer}
       >
         <AboutUs />
       </motion.div>
 
       {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        variants={staggerContainer}
       >
         <InteractiveBuilder
           config={activeConfig}
@@ -160,19 +185,19 @@ export default function App() {
 
       {/* 3. MATERIAL PORTFOLIO TAB LAB & CROSS SECTION EXPLODER */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        variants={staggerContainer}
       >
         <ProductCatalog />
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        variants={staggerContainer}
       >
         <ContactUs />
       </motion.div>
@@ -233,6 +258,8 @@ export default function App() {
 
         </div>
       </footer>
+
+      <FloatingActions onScrollToContact={handleScrollToContact} />
 
     </div>
   );

@@ -93,6 +93,39 @@ export const SPORT_PRESETS: Record<string, SportDetails> = {
     maxDimensions: { length: 70, width: 35 },
     iconName: 'Trophy',
     basePricePerSqFt: 320.00,
+  },
+  SWIMMING_POOL: {
+    id: 'SWIMMING_POOL',
+    name: 'Swimming Pool',
+    tagline: 'Custom premium pools & integrated thermal systems',
+    description: 'Bespoke high-end swimming pools fitted with state-of-the-art filtration, customizable underwater LEDs, ceramic glass steps, and eco-friendly temperature controls.',
+    minDimensions: { length: 30, width: 15 },
+    defaultDimensions: { length: 75, width: 35 },
+    maxDimensions: { length: 164, width: 82 },
+    iconName: 'Waves',
+    basePricePerSqFt: 620.00,
+  },
+  SQUASH: {
+    id: 'SQUASH',
+    name: 'Squash Court',
+    tagline: 'Elite WSF-grade high-rebound speed arena',
+    description: 'Flawlessly leveled Canadian Maple hardwood, heavy high-impact armor plaster wall surfaces, and integrated crystal clear heavy back safety glass.',
+    minDimensions: { length: 32, width: 21 },
+    defaultDimensions: { length: 32, width: 21 },
+    maxDimensions: { length: 45, width: 30 },
+    iconName: 'Layout',
+    basePricePerSqFt: 480.00,
+  },
+  VOLLEYBALL: {
+    id: 'VOLLEYBALL',
+    name: 'Volleyball Court',
+    tagline: 'FIVB-grade high-trampoline elastic court designs',
+    description: 'Precision-lined volleyball layout designed with elite shock absorption and non-slip surface traction for dynamic leaping and defensive dives.',
+    minDimensions: { length: 50, width: 25 },
+    defaultDimensions: { length: 60, width: 30 },
+    maxDimensions: { length: 80, width: 40 },
+    iconName: 'Volleyball',
+    basePricePerSqFt: 340.00,
   }
 };
 
@@ -181,6 +214,85 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterialDetails> = {
       { name: 'Primary Polypropylene Non-Woven backing', thickness: '5mm', desc: 'Secure tufting grid' },
       { name: 'Elastic Shockpad Underlayment (E-Layer)', thickness: '10mm', desc: 'Ultimate safety padding on aggregate layers' }
     ]
+  },
+  MOSAIC_CLASSIC: {
+    id: 'MOSAIC_CLASSIC',
+    name: 'Royal Mosaic Ceramic & Glass Tiles',
+    category: 'All-Weather',
+    description: 'Stunning premium glass and ceramic mosaic tiling. Hand-laid with epoxy grout and specialized anti-slip textured glazes for ultimate water aesthetics and safety.',
+    costPerSqFt: 2100.00,
+    thickness: '12mm Premium Mosaic Blend',
+    warranty: '20 Years Leakproof & Bonding Guarantee',
+    features: [
+      'Stain-resistant glass-grade finishes',
+      'Anti-erosion epoxy mortar locks',
+      'Exquisite reflecting prism color effect',
+      'Ultra high water chemical & UV resistance'
+    ],
+    crossSectionLayers: [
+      { name: 'Glistening Prism Glass Mosaic Tiles', thickness: '8mm', desc: 'Satin gloss, hand-cut glass tile blocks' },
+      { name: 'Water-impermeable Flexible Epoxy Membrane', thickness: '2mm', desc: 'Complete leakproof sealant bond' },
+      { name: 'Polymer-Modified Flex Cement Mortar Bed', thickness: '12mm', desc: 'Secure structural grip layer' }
+    ]
+  },
+  GLASS_BEAD_PLASTER: {
+    id: 'GLASS_BEAD_PLASTER',
+    name: 'Shimmering Quartz & Glass Bead Plaster',
+    category: 'All-Weather',
+    description: 'A hybrid blend of pure white quartz plaster and colored glass beads. Creates a highly textured, slip-resistant surface that sparkles naturally underwater.',
+    costPerSqFt: 1150.00,
+    thickness: '15mm Monolithic Plaster Spray',
+    warranty: '10 Years Color-Lock Guarantee',
+    features: [
+      'Stains and algae-resistant structure',
+      'Smooth, non-abrasive finish on feet',
+      'Iridescent light reflection spectrum',
+      'High density compression prevents peeling'
+    ],
+    crossSectionLayers: [
+      { name: 'White Portland Cement & Glass Bead Plaster', thickness: '15mm', desc: 'Highly compact, polished surface finish' },
+      { name: 'Concrete Bond Coat Adhesive Primer', thickness: '1mm', desc: 'Provides perfect physical interface to concrete base' }
+    ]
+  },
+  REINFORCED_PVC_LINER: {
+    id: 'REINFORCED_PVC_LINER',
+    name: 'Heavy-Duty Reinforced PVC Liner',
+    category: 'All-Weather',
+    description: 'Commercial-grade, polyester-mesh reinforced PVC membranes. Fully welded onsite to ensure perfect fit and a completely flexible, puncture-resistant finish.',
+    costPerSqFt: 820.00,
+    thickness: '1.5mm Gauge Membrane',
+    warranty: '12 Years Thermal & Water Tight Guarantee',
+    features: [
+      'High resistance against structural shifting',
+      'Pre-treated for microbial and algae suppression',
+      'Speedy professional thermal welding process',
+      'Extremely easy to clean & maintain'
+    ],
+    crossSectionLayers: [
+      { name: 'UV Protective Top Acrylic Barrier', thickness: '0.1mm', desc: 'Protects from sun fading' },
+      { name: 'Mesh Reinforced Polyvinyl Chloride', thickness: '1.5mm', desc: 'Polyester core mesh encased in premium PVC' },
+      { name: 'Fleece Cushioned Protective Underlay', thickness: '2.0mm', desc: 'Puncture shield and thermal buffer' }
+    ]
+  },
+  ARMOURCOAT_WALLS: {
+    id: 'ARMOURCOAT_WALLS',
+    name: 'Armourcoat High-Impact Squash Wall System',
+    category: 'Indoor',
+    description: 'The world-standard multi-layer plaster formula certified by the World Squash Federation. Perfectly flat, joint-free, and delivers extremely loud ball impact feedback.',
+    costPerSqFt: 1450.00,
+    thickness: '18mm Dense Multicoat Plaster',
+    warranty: '15 Years Dent-Resistant Guarantee',
+    features: [
+      'WSF Standard Certified',
+      'Joint-free, perfectly monolithic plaster surface',
+      'Extreme hardness, resists cracking from rackets',
+      'Vibrant optic white finish for high ball contrast'
+    ],
+    crossSectionLayers: [
+      { name: 'WSF Bright White Finish Glaze', thickness: '2mm', desc: 'Smooth, dense high-vis wall finish' },
+      { name: 'Fibre-Reinforced Base Render', thickness: '10mm', desc: 'Dent resistance & sound deadening layer' },
+      { name: 'Undercoat Primer and Adhesive Resin', thickness: '1.5mm', desc: 'Solid bond to structural brickwork' }
+    ]
   }
 };
 
@@ -216,6 +328,86 @@ export const SUB_BASES: Record<string, SubbaseDetails> = {
     costPerSqFt: 600.00,
     durability: 'Excellent - Portable & reusable platform',
     bestFor: 'Fast temporary installations, rooftops, or slope-prone spots'
+  },
+  FOOTBALL_DRAINAGE_AGGREGATE: {
+    id: 'FOOTBALL_DRAINAGE_AGGREGATE',
+    name: 'Dynamic Fine Aggregate drainage system',
+    description: 'Crushed gravel beds graded and pressed with laser accuracy, integrated with micro-perforated sub-surface storm drains.',
+    costPerSqFt: 460.00,
+    durability: 'Superb - Over 25 Years (Extreme porosity)',
+    bestFor: 'FIFA Standard Football Turfs & Drainage Areas'
+  },
+  FOOTBALL_SHOCKPAD_BASE: {
+    id: 'FOOTBALL_SHOCKPAD_BASE',
+    name: 'Elastic Shockpad Underlap Aggregate Foundation',
+    description: '10mm thickness polyurethane-bound rubber crumb shockpad combined with dynamic porous stone for elite impact safety.',
+    costPerSqFt: 630.00,
+    durability: 'High Performance - 15 to 20 Years',
+    bestFor: 'Injury Prevention & Pro Football Turf Projects'
+  },
+  CRICKET_HEAVY_CLAY: {
+    id: 'CRICKET_HEAVY_CLAY',
+    name: 'Rolled Heavy Clay/Loam Pitch Foundation',
+    description: 'High-density bulli clay layers compacted down using a multi-ton vibratory roller to create a hard, dry bounce surface.',
+    costPerSqFt: 550.00,
+    durability: 'Continuous Maintenance - Rebuild/Resurface seasonally',
+    bestFor: 'High-bounce Professional Level Cricket Match Pitches'
+  },
+  CRICKET_COMPACT_STONE: {
+    id: 'CRICKET_COMPACT_STONE',
+    name: 'Crushed Limestone & Sand Bed Dynamic Foundation',
+    description: 'Layered crushed rock topped with premium fine river sand. Ensures flat, true ball behavior for net practicing cages.',
+    costPerSqFt: 390.00,
+    durability: 'Excellent - Over 20 Years',
+    bestFor: 'Cricket Practice Cages, Surrounds & Outfields'
+  },
+  GYM_ACOUSTIC_SLAB: {
+    id: 'GYM_ACOUSTIC_SLAB',
+    name: 'Acoustic Floating Concrete Slab',
+    description: 'Heavy concrete slab poured over high-performance elastomeric pads, completely isolating weight impacts from structural framing.',
+    costPerSqFt: 980.00,
+    durability: 'Indestructible - Over 50 Years',
+    bestFor: 'Commercial Gyms, Free Weights Areas & Multi-level Fitness Centers'
+  },
+  GYM_RUBBER_DAMPENING: {
+    id: 'GYM_RUBBER_DAMPENING',
+    name: 'Vibration Dampening Rubber Overlay Foundation',
+    description: 'Interlocking vulcanized rubber under-mats designed to cushion vibration, suppress low-frequency hums, and protect sub-concrete.',
+    costPerSqFt: 520.00,
+    durability: 'Extremely Durable - Over 25 Years',
+    bestFor: 'Boutique Gyms, Yoga, HIIT Rooms, and Cardio areas'
+  },
+  POOL_SHOTCRETE_SHELL: {
+    id: 'POOL_SHOTCRETE_SHELL',
+    name: 'Pneumatic Reinforced Shotcrete Shell',
+    description: 'Rebar grid structure sprayed with high-impact wet-mix concrete, forming a rock-solid, monolithic leakproof shell.',
+    costPerSqFt: 1850.00,
+    durability: 'Lifetime - Structurally guaranteed over 50 Years',
+    bestFor: 'Premium Backyards & Olympic Institutional Swimming Pools'
+  },
+  POOL_POURED_CONCRETE: {
+    id: 'POOL_POURED_CONCRETE',
+    name: 'Cast-in-Place Concrete Slab with Waterstops',
+    description: 'Formwork-cast Portland concrete combined with PVC waterstop joints and integrated hydrostatic relief valves.',
+    costPerSqFt: 2150.00,
+    durability: 'Extreme - Outstanding structural integrity',
+    bestFor: 'High-Water-Table Locations & Commercial Pools'
+  },
+  SQUASH_DOUBLE_BATTEN: {
+    id: 'SQUASH_DOUBLE_BATTEN',
+    name: 'Double-Sleeved Resilient Batten Sleeper',
+    description: 'Certified WSF design. Dual-layer timber sleeper battens interlaid with neoprene pads for maximum bounce uniformity and energy return.',
+    costPerSqFt: 1100.00,
+    durability: 'Professional Grade - 20 to 30 Years (Dry environments)',
+    bestFor: 'World Championship Quality WSF Player Arenas'
+  },
+  SQUASH_SINGLE_ELASTIC: {
+    id: 'SQUASH_SINGLE_ELASTIC',
+    name: 'Single-Sleeved Resilient Lumber Cushioning',
+    description: 'Standard resilient softwood batten system. Budget-friendly player cushioning that reduces muscle fatigue.',
+    costPerSqFt: 780.00,
+    durability: 'Very Good - 15 to 20 Years',
+    bestFor: 'School, Club & Secondary Residential Squash Facilities'
   }
 };
 

@@ -148,6 +148,29 @@ const SimulatedBall = ({ sportType, courtL, courtW, animate, visible = true }: {
       const y = 0.1 + 1.2 * Math.sin(relativeTime);
 
       ballRef.current.position.set(Math.sin(time * 0.5) * 1.2, y, z);
+    } else if (sportType === 'SQUASH') {
+      // Squash ball bouncing off front wall and floor
+      const cycle = (time * 2.5) % 3; // fast pace
+      let x = Math.sin(time * 0.8) * (courtW * 0.25);
+      let y = 0.1;
+      let z = 0;
+
+      if (cycle < 1.5) {
+        // Traveling towards front wall (z = -courtL/2)
+        const p = cycle / 1.5;
+        const playerZ = courtL * 0.25;
+        const frontWallZ = -courtL * 0.48;
+        z = playerZ - p * (playerZ - frontWallZ);
+        y = 0.12 + 1.5 * Math.sin(p * Math.PI);
+      } else {
+        // Rebounding off front wall back to floor
+        const p = (cycle - 1.5) / 1.5;
+        const frontWallZ = -courtL * 0.48;
+        const playerZ = courtL * 0.25;
+        z = frontWallZ + p * (playerZ - frontWallZ);
+        y = 0.12 + 0.5 * Math.sin(p * Math.PI);
+      }
+      ballRef.current.position.set(x, y, z);
     } else if (sportType === 'FOOTBALL') {
       // Soccer ball flying/sliding between player positions
       const cycle = time * 1.5;
@@ -200,6 +223,13 @@ const SimulatedBall = ({ sportType, courtL, courtW, animate, visible = true }: {
         z = 0;
       }
       ballRef.current.position.set(x, y, z);
+    } else if (sportType === 'VOLLEYBALL') {
+      // Volleyball bouncing/passing back and forth over a high net
+      const cycle = time * 2.0;
+      const z = Math.sin(cycle) * (courtL * 0.35);
+      const relativeTime = (cycle % Math.PI);
+      const y = 0.15 + 1.8 * Math.sin(relativeTime);
+      ballRef.current.position.set(Math.sin(time * 0.4) * 0.8, y, z);
     }
   });
 
@@ -222,6 +252,12 @@ const SimulatedBall = ({ sportType, courtL, courtW, animate, visible = true }: {
   } else if (sportType === 'CRICKET') {
     ballColor = '#b91c1c';
     ballSize = 0.08;
+  } else if (sportType === 'SQUASH') {
+    ballColor = '#1e293b'; // dark ball
+    ballSize = 0.052; // very small squash ball
+  } else if (sportType === 'VOLLEYBALL') {
+    ballColor = '#facc15'; // yellow/blue standard volleyball color
+    ballSize = 0.14;
   } else {
     return null;
   }
@@ -266,6 +302,26 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
     secondaryHex = '#CF9B55';
     roughness = 0.3; // glossy
     metalness = 0.1;
+  } else if (surfaceMaterial === 'MOSAIC_CLASSIC') {
+    primaryHex = '#0ea5e9'; // glossy beautiful water-reflective mosaic tiles
+    secondaryHex = '#0284c7';
+    roughness = 0.15;
+    metalness = 0.55;
+  } else if (surfaceMaterial === 'GLASS_BEAD_PLASTER') {
+    primaryHex = '#ffffff'; // sparking white bead pool plaster
+    secondaryHex = '#bae6fd';
+    roughness = 0.35;
+    metalness = 0.25;
+  } else if (surfaceMaterial === 'REINFORCED_PVC_LINER') {
+    primaryHex = '#38bdf8'; // sky blue vinyl liner
+    secondaryHex = '#0ea5e9';
+    roughness = 0.55;
+    metalness = 0.05;
+  } else if (surfaceMaterial === 'ARMOURCOAT_WALLS') {
+    primaryHex = '#fafaf9'; // bright squash wall white plaster
+    secondaryHex = '#e5e5e5';
+    roughness = 0.95;
+    metalness = 0.0;
   } else if (surfaceMaterial === 'COMPOSITE_TURF') {
     primaryHex = '#1E5E3A';
     secondaryHex = '#144327';
@@ -944,6 +1000,266 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
             />
         </group>
       )}
+
+       {sportType === 'SWIMMING_POOL' && (
+         <group>
+            {/* Deep pool concrete frame */}
+            <Box args={[courtW + 0.4, 0.6, courtL + 0.4]} position={[0, -0.3, 0]} receiveShadow>
+              <meshStandardMaterial color="#334155" roughness={0.7} />
+            </Box>
+ 
+            {/* Beautiful water block - translucent blue reflection */}
+            <Box args={[courtW - 0.2, 0.5, courtL - 0.2]} position={[0, -0.22, 0]} castShadow receiveShadow>
+              <meshStandardMaterial 
+                color="#0ea5e9" 
+                roughness={0.15} 
+                metalness={0.45} 
+                transparent 
+                opacity={0.65} 
+              />
+            </Box>
+ 
+            {/* Pool Steps ladder */}
+            {[-1, 1].map((xSide) => (
+              <group key={xSide} position={[xSide * (courtW/2 - 0.4), 0, -courtL/2 + 1.2]}>
+                <Cylinder args={[0.02, 0.02, 0.6, 8]} position={[0, 0.3, 0]} castShadow>
+                  <meshStandardMaterial color="#9ca3af" roughness={0.1} metalness={0.9} />
+                </Cylinder>
+                <Box args={[0.2, 0.02, 0.1]} position={[0, 0.2, 0]}>
+                  <meshStandardMaterial color="#e2e8f0" />
+                </Box>
+              </group>
+            ))}
+ 
+            {/* Pool lines on floor */}
+            {Array.from({length: 3}).map((_, i) => (
+              <Box key={i} args={[0.04, 0.015, courtL - 1.5]} position={[(i - 1) * (courtW / 4), -0.47, 0]}>
+                <meshStandardMaterial color="#0284c7" />
+              </Box>
+            ))}
+ 
+            {/* Rest/swimming abstract players */}
+            <AbstractPlayer 
+               position={[-courtW/2 + 1.2, 0, courtL * 0.25]} 
+               color="#38bdf8" 
+               rotation={[0, Math.PI / 2, 0]} 
+               movementDistance={1.2}
+               movementSpeed={1.5}
+               moveAxis="z"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+            <AbstractPlayer 
+               position={[courtW/2 - 1.2, 0, -courtL * 0.25]} 
+               color="#ec4899" 
+               rotation={[0, -Math.PI / 2, 0]} 
+               movementDistance={1.5}
+               movementSpeed={1.2}
+               moveAxis="z"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+         </group>
+       )}
+ 
+       {sportType === 'SQUASH' && (
+         <group>
+            {/* Wooden squash hardwood floor overlay */}
+            <Box args={[courtW, 0.14, courtL]} position={[0, -0.04, 0]} receiveShadow>
+              <meshStandardMaterial color="#F1C27B" roughness={0.3} metalness={0.1} />
+            </Box>
+ 
+            {/* Front squash plaster white wall */}
+            <Box args={[courtW, 3.5, 0.1]} position={[0, 1.75, -courtL/2]} castShadow>
+              <meshStandardMaterial color="#ffffff" roughness={0.95} />
+            </Box>
+            {/* Red Board line at the bottom of the front wall */}
+            <Box args={[courtW, 0.45, 0.12]} position={[0, 0.225, -courtL/2 + 0.01]} castShadow>
+              <meshStandardMaterial color="#991b1b" roughness={0.8} />
+            </Box>
+            {/* Middle service line */}
+            <Box args={[courtW, 0.06, 0.12]} position={[0, 1.6, -courtL/2 + 0.01]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            {/* Out-of-court top wall line */}
+            <Box args={[courtW, 0.06, 0.12]} position={[0, 3.2, -courtL/2 + 0.01]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+ 
+            {/* Side plaster walls */}
+            <Box args={[0.1, 3.5, courtL]} position={[-courtW/2, 1.75, 0]} castShadow>
+              <meshStandardMaterial color="#f5f5f4" roughness={0.95} />
+            </Box>
+            <Box args={[0.1, 3.5, courtL]} position={[courtW/2, 1.75, 0]} castShadow>
+              <meshStandardMaterial color="#f5f5f4" roughness={0.95} />
+            </Box>
+ 
+            {/* Glass back wall */}
+            <Box args={[courtW, 2.2, 0.08]} position={[0, 1.1, courtL/2]} castShadow>
+              <meshStandardMaterial color="#bae6fd" transparent opacity={0.25} roughness={0.05} metalness={0.85} />
+            </Box>
+            {/* Red Out boundary boundary back wall line */}
+            <Box args={[courtW, 0.04, 0.1]} position={[0, 2.13, courtL/2 - 0.01]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+ 
+            {/* Red markings on floor */}
+            {/* Short Service line across court width */}
+            <Box args={[courtW, 0.02, 0.05]} position={[0, 0.035, courtL * 0.12]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            {/* Longitudinal half-court line */}
+            <Box args={[0.05, 0.02, courtL * 0.38]} position={[0, 0.035, courtL * 0.31]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            {/* Left service box */}
+            <Box args={[courtW * 0.25, 0.02, 0.05]} position={[-courtW * 0.375, 0.035, courtL * 0.12]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            <Box args={[0.05, 0.02, courtL * 0.15]} position={[-courtW * 0.25, 0.035, courtL * 0.195]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            {/* Right service box */}
+            <Box args={[courtW * 0.25, 0.02, 0.05]} position={[courtW * 0.375, 0.035, courtL * 0.12]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+            <Box args={[0.05, 0.02, courtL * 0.15]} position={[courtW * 0.25, 0.035, courtL * 0.195]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Box>
+ 
+            {/* Squash abstract players pacing around playing */}
+            <AbstractPlayer 
+               position={[-1.2, 0, courtL * 0.1]} 
+               color="#3b82f6" 
+               rotation={[0, 0, 0]} 
+               movementDistance={1.2}
+               movementSpeed={2.5}
+               moveAxis="x"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+            <AbstractPlayer 
+               position={[1.2, 0, courtL * 0.22]} 
+               color="#ea580c" 
+               rotation={[0, Math.PI, 0]} 
+               movementDistance={1.5}
+               movementSpeed={2.5}
+               moveAxis="z"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+            <SimulatedBall sportType="SQUASH" courtL={courtL} courtW={courtW} animate={animatePlayers} visible={visualizePlayers} />
+          </group>
+        )}
+
+       {sportType === 'VOLLEYBALL' && (
+         <group>
+            {/* Center Line directly below net */}
+            <Box args={[courtW, 0.015, 0.05]} position={[0, 0.025, 0]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+
+            {/* Attack Lines (3m / ~10ft on each side of the net) */}
+            <Box args={[courtW, 0.015, 0.05]} position={[0, 0.025, 10]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+            <Box args={[courtW, 0.015, 0.05]} position={[0, 0.025, -10]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+
+            {/* Boundary Outlines - End lines */}
+            <Box args={[courtW, 0.015, 0.05]} position={[0, 0.025, courtL/2]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+            <Box args={[courtW, 0.015, 0.05]} position={[0, 0.025, -courtL/2]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+
+            {/* Boundary Outlines - Sidelines */}
+            <Box args={[0.05, 0.015, courtL]} position={[courtW/2, 0.025, 0]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+            <Box args={[0.05, 0.015, courtL]} position={[-courtW/2, 0.025, 0]}>
+              <meshStandardMaterial color={lineStroke} />
+            </Box>
+
+            {/* Heavy steel posts on both sides of court */}
+            <Cylinder args={[0.04, 0.04, 2.4, 8]} position={[courtW/2 + 0.2, 1.2, 0]} castShadow>
+              <meshStandardMaterial color="#3b82f6" roughness={0.3} metalness={0.8} />
+            </Cylinder>
+            <Cylinder args={[0.04, 0.04, 2.4, 8]} position={[-courtW/2 - 0.2, 1.2, 0]} castShadow>
+              <meshStandardMaterial color="#3b82f6" roughness={0.3} metalness={0.8} />
+            </Cylinder>
+
+            {/* The professional mesh Volleyball Net */}
+            <Box args={[courtW + 0.4, 0.8, 0.015]} position={[0, 1.8, 0]} castShadow>
+              <meshStandardMaterial color="#1e293b" transparent opacity={0.5} wireframe />
+            </Box>
+            {/* White top edge tape of the net */}
+            <Box args={[courtW + 0.4, 0.07, 0.022]} position={[0, 2.2, 0]}>
+              <meshStandardMaterial color="#ffffff" roughness={0.6} />
+            </Box>
+            {/* White bottom tape of the net */}
+            <Box args={[courtW + 0.4, 0.04, 0.022]} position={[0, 1.4, 0]}>
+              <meshStandardMaterial color="#ffffff" roughness={0.6} />
+            </Box>
+
+            {/* Red net antennae indicators */}
+            <Cylinder args={[0.01, 0.01, 1.2, 8]} position={[courtW/2, 2.0, 0]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Cylinder>
+            <Cylinder args={[0.01, 0.01, 1.2, 8]} position={[-courtW/2, 2.0, 0]}>
+              <meshStandardMaterial color="#ef4444" />
+            </Cylinder>
+
+            {/* Dynamic active players */}
+            {/* Team A (Blue side) */}
+            <AbstractPlayer 
+               position={[1.5, 0, courtL * 0.15]} 
+               color="#3b82f6" 
+               rotation={[0, Math.PI, 0]} 
+               movementDistance={1.5}
+               movementSpeed={2.2}
+               moveAxis="x"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+            <AbstractPlayer 
+               position={[-1.2, 0, courtL * 0.35]} 
+               color="#2563eb" 
+               rotation={[0, Math.PI, 0]} 
+               movementDistance={1.8}
+               movementSpeed={1.8}
+               moveAxis="z"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+
+            {/* Team B (Pink/Orange side) */}
+            <AbstractPlayer 
+               position={[-1.5, 0, -courtL * 0.15]} 
+               color="#ec4899" 
+               rotation={[0, 0, 0]} 
+               movementDistance={1.5}
+               movementSpeed={2.2}
+               moveAxis="x"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+            <AbstractPlayer 
+               position={[1.2, 0, -courtL * 0.35]} 
+               color="#db2777" 
+               rotation={[0, 0, 0]} 
+               movementDistance={1.8}
+               movementSpeed={1.8}
+               moveAxis="z"
+               animate={animatePlayers}
+               visible={visualizePlayers}
+             />
+
+            <SimulatedBall sportType="VOLLEYBALL" courtL={courtL} courtW={courtW} animate={animatePlayers} visible={visualizePlayers} />
+         </group>
+       )}
 
       {/* Smart Floodlights */}
       {selectedSmartFeatures.includes('SMART_FLOODLIGHTS') && (

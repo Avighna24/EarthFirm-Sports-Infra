@@ -70,7 +70,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartCustomizer, onViewCatalog, on
 
         {/* Layer 3: Content (uid=745) */}
         <div className="relative z-10 text-center px-6 max-w-6xl py-12">
-          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-brand-sage font-mono font-bold block mb-4">
+          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-white font-mono font-bold block mb-4">
             {language === 'hi' ? 'मध्य भारत का सर्वश्रेष्ठ समूह' : "CENTRAL INDIA'S FINER INFRASTRUCTURE EXPERTS"}
           </span>
           <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black tracking-tighter uppercase mb-6 text-white leading-none">
@@ -82,8 +82,8 @@ export const Hero: React.FC<HeroProps> = ({ onStartCustomizer, onViewCatalog, on
           </h1>
           <p className="text-base sm:text-xl text-gray-300 mb-12 tracking-wide font-light max-w-3xl mx-auto leading-relaxed">
             {language === 'hi' 
-              ? 'टूर्नामेंट-स्तर के कनाडाई मेपल लकड़ी कोर्ट, कुशन एक्रिलिक और सिंथेटिक टर्फ एरेनास के लिए मध्य भारत का प्रमुख खेल बुनियादी ढांचा समूह।'
-              : "Central India's Finest Sports Infrastructure Group"}
+              ? 'गुणवत्ता, सुरक्षा और विश्वसनीयता के उच्चतम मानकों को बनाए रखते हुए अभिनव, टिकाऊ और उच्च-प्रदर्शन वाले खेल बुनियादी ढांचे का निर्माण करना जिससे एथलीट, संस्थान और समुदाय विश्व स्तरीय खेल अनुकूल वातावरण का अनुभव कर सकें।'
+              : "To deliver innovative, durable, and high-performance sports infrastructure that enables athletes, institutions, and communities to experience world-class sporting environments while maintaining the highest standards of quality, safety, and reliability."}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
@@ -103,49 +103,6 @@ export const Hero: React.FC<HeroProps> = ({ onStartCustomizer, onViewCatalog, on
           </div>
         </div>
       </section>
-
-      {/* Bottom Gallery Bar from design template */}
-      <div className="bg-white border-b border-stone-200 grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-stone-200/60">
-        <div 
-          onClick={() => onSelectShowcase(showcasePresets.showcase1)} 
-          className="p-6 flex flex-col justify-between hover:bg-stone-50 transition-colors cursor-pointer group animate-fade-in"
-          id="showcase-01-card"
-        >
-          <span className="text-[9px] font-bold text-brand-sage uppercase tracking-widest font-mono">Arena Showcase 01</span>
-          <h4 className="text-base font-serif italic text-brand-stone mt-2 mb-1 group-hover:text-brand-sage transition">The Stone Atrium</h4>
-          <p className="text-[10px] text-stone-400 font-mono uppercase tracking-wider">Malibu, CA (Basketball / PP Tiles)</p>
-        </div>
-        
-        <div 
-          onClick={() => onSelectShowcase(showcasePresets.showcase2)} 
-          className="p-6 flex flex-col justify-between hover:bg-stone-50 transition-colors cursor-pointer group animate-fade-in"
-          id="showcase-02-card"
-        >
-          <span className="text-[9px] font-bold text-brand-sage uppercase tracking-widest font-mono">Arena Showcase 02</span>
-          <h4 className="text-base font-serif italic text-brand-stone mt-2 mb-1 group-hover:text-brand-sage transition">Sky-Tree Court</h4>
-          <p className="text-[10px] text-stone-400 font-mono uppercase tracking-wider">Hamptons, NY (Tennis / Acrylic)</p>
-        </div>
-        
-        <div 
-          onClick={() => onSelectShowcase(showcasePresets.showcase3)} 
-          className="p-6 flex flex-col justify-between hover:bg-stone-50 transition-colors cursor-pointer group animate-fade-in"
-          id="showcase-03-card"
-        >
-          <span className="text-[9px] font-bold text-brand-sage uppercase tracking-widest font-mono">Arena Showcase 03</span>
-          <h4 className="text-base font-serif italic text-brand-stone mt-2 mb-1 group-hover:text-brand-sage transition">Baskerville Canopy</h4>
-          <p className="text-[10px] text-stone-400 font-mono uppercase tracking-wider">London, UK (Football / Turf)</p>
-        </div>
-        
-        <div 
-          onClick={onStartCustomizer} 
-          className="p-6 flex items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer group"
-        >
-          <div className="text-center group-p">
-            <div className="text-xs font-bold uppercase tracking-widest text-brand-stone mb-1 font-mono">Configure Your Own</div>
-            <div className="h-0.5 w-16 mx-auto bg-brand-sage scale-x-50 group-hover:scale-x-100 transition-transform duration-350"></div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

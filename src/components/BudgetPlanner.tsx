@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
@@ -42,6 +42,8 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   const [sportType, setSportType] = useState<SportType>('BASKETBALL');
   const [length, setLength] = useState<number>(94);
   const [width, setWidth] = useState<number>(50);
+  const [visualLength, setVisualLength] = useState<number>(94);
+  const [visualWidth, setVisualWidth] = useState<number>(50);
   const [surfaceMaterial, setSurfaceMaterial] = useState<SurfaceMaterialType>('CANADIAN_MAPLE');
   const [subbase, setSubbase] = useState<SubbaseType>('POST_TENSION_CONCRETE');
   const [budgetTier, setBudgetTier] = useState<'Standard' | 'Premium' | 'Luxury Elite'>('Premium');
@@ -57,23 +59,55 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionCode, setSubmissionCode] = useState('');
 
+  // Debounce visual input changes to heavier calculations (80ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualLength !== length) setLength(visualLength);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualLength, length]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualWidth !== width) setWidth(visualWidth);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualWidth, width]);
+
   // Handle sport preset changes to update default dimensions
   const handleSportSelect = (sport: SportType) => {
     setSportType(sport);
     const preset = SPORT_PRESETS[sport];
     if (preset) {
       setLength(preset.defaultDimensions.length);
+      setVisualLength(preset.defaultDimensions.length);
       setWidth(preset.defaultDimensions.width);
+      setVisualWidth(preset.defaultDimensions.width);
       
       // Smartly adjust default materials for outdoor/indoor sports
       if (sport === 'FOOTBALL') {
         setSurfaceMaterial('COMPOSITE_TURF');
-        setSubbase('COMPACTED_STONE');
+        setSubbase('FOOTBALL_DRAINAGE_AGGREGATE');
+      } else if (sport === 'CRICKET') {
+        setSurfaceMaterial('COMPOSITE_TURF');
+        setSubbase('CRICKET_COMPACT_STONE');
+      } else if (sport === 'SWIMMING_POOL') {
+        setSurfaceMaterial('MOSAIC_CLASSIC');
+        setSubbase('POOL_SHOTCRETE_SHELL');
+      } else if (sport === 'SQUASH') {
+        setSurfaceMaterial('CANADIAN_MAPLE');
+        setSubbase('SQUASH_DOUBLE_BATTEN');
+      } else if (sport === 'GYM') {
+        setSurfaceMaterial('CANADIAN_MAPLE');
+        setSubbase('GYM_ACOUSTIC_SLAB');
       } else if (sport === 'TENNIS' || sport === 'PICKLEBALL') {
         setSurfaceMaterial('PRO_ACRYLIC');
         setSubbase('POST_TENSION_CONCRETE');
-      } else if (sport === 'BASKETBALL' || sport === 'BADMINTON' || sport === 'GYM') {
+      } else if (sport === 'BASKETBALL' || sport === 'BADMINTON' || sport === 'VOLLEYBALL') {
         setSurfaceMaterial('CANADIAN_MAPLE');
+        setSubbase('POST_TENSION_CONCRETE');
+      } else {
+        setSurfaceMaterial('PRO_ACRYLIC');
         setSubbase('POST_TENSION_CONCRETE');
       }
     }
@@ -250,27 +284,33 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                   <button
                     onClick={() => {
                       setLength(Math.round(sportPreset.minDimensions.length));
+                      setVisualLength(Math.round(sportPreset.minDimensions.length));
                       setWidth(Math.round(sportPreset.minDimensions.width));
+                      setVisualWidth(Math.round(sportPreset.minDimensions.width));
                     }}
-                    className="p-3 bg-neutral-900 text-xs font-bold font-mono tracking-wider uppercase border border-neutral-800 hover:bg-neutral-800 rounded-xl"
+                    className="p-3 bg-neutral-900 text-xs font-bold font-mono tracking-wider uppercase border border-neutral-800 hover:bg-neutral-800 rounded-xl cursor-pointer"
                   >
                     Minimum Compact
                   </button>
                   <button
                     onClick={() => {
                       setLength(Math.round(sportPreset.defaultDimensions.length));
+                      setVisualLength(Math.round(sportPreset.defaultDimensions.length));
                       setWidth(Math.round(sportPreset.defaultDimensions.width));
+                      setVisualWidth(Math.round(sportPreset.defaultDimensions.width));
                     }}
-                    className="p-3 bg-white text-black text-xs font-bold font-mono tracking-wider uppercase rounded-xl"
+                    className="p-3 bg-white text-black text-xs font-bold font-mono tracking-wider uppercase rounded-xl cursor-pointer"
                   >
                     Official Standard
                   </button>
                   <button
                     onClick={() => {
                       setLength(Math.round(sportPreset.maxDimensions.length));
+                      setVisualLength(Math.round(sportPreset.maxDimensions.length));
                       setWidth(Math.round(sportPreset.maxDimensions.width));
+                      setVisualWidth(Math.round(sportPreset.maxDimensions.width));
                     }}
-                    className="p-3 bg-neutral-900 text-xs font-bold font-mono tracking-wider uppercase border border-neutral-800 hover:bg-neutral-800 rounded-xl"
+                    className="p-3 bg-neutral-900 text-xs font-bold font-mono tracking-wider uppercase border border-neutral-800 hover:bg-neutral-800 rounded-xl cursor-pointer"
                   >
                     Maximum Expanded
                   </button>
@@ -280,15 +320,15 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                   {/* Length Slider */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
-                      <span>LENGTH: <strong className="text-white text-sm">{length} Feet</strong> ({Math.round(length * 0.3048)} m)</span>
+                      <span>LENGTH: <strong className="text-white text-sm">{visualLength} Feet</strong> ({Math.round(visualLength * 0.3048)} m)</span>
                       <span>Range: {sportPreset.minDimensions.length}&apos; - {sportPreset.maxDimensions.length}&apos;</span>
                     </div>
                     <input
                       type="range"
                       min={sportPreset.minDimensions.length}
                       max={sportPreset.maxDimensions.length}
-                      value={length}
-                      onChange={(e) => setLength(Number(e.target.value))}
+                      value={visualLength}
+                      onChange={(e) => setVisualLength(Number(e.target.value))}
                       className="w-full accent-white bg-neutral-805 h-1.5 rounded cursor-col-resize"
                     />
                   </div>
@@ -296,15 +336,15 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                   {/* Width Slider */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
-                      <span>WIDTH: <strong className="text-white text-sm">{width} Feet</strong> ({Math.round(width * 0.3048)} m)</span>
+                      <span>WIDTH: <strong className="text-white text-sm">{visualWidth} Feet</strong> ({Math.round(visualWidth * 0.3048)} m)</span>
                       <span>Range: {sportPreset.minDimensions.width}&apos; - {sportPreset.maxDimensions.width}&apos;</span>
                     </div>
                     <input
                       type="range"
                       min={sportPreset.minDimensions.width}
                       max={sportPreset.maxDimensions.width}
-                      value={width}
-                      onChange={(e) => setWidth(Number(e.target.value))}
+                      value={visualWidth}
+                      onChange={(e) => setVisualWidth(Number(e.target.value))}
                       className="w-full accent-white bg-neutral-805 h-1.5 rounded cursor-col-resize"
                     />
                   </div>
@@ -313,7 +353,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                 {/* Live Area Snapshot */}
                 <div className="py-4 border-t border-neutral-900 flex justify-between items-center text-xs text-neutral-400">
                   <span>Computed Playground Ground Area:</span>
-                  <span className="font-mono text-white text-lg font-bold">{areaSqFt.toLocaleString()} Sq. Ft</span>
+                  <span className="font-mono text-white text-lg font-bold">{(visualLength * visualWidth).toLocaleString()} Sq. Ft</span>
                 </div>
 
               </div>
@@ -357,7 +397,19 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                 <div className="space-y-4">
                   <h3 className="text-xs uppercase tracking-wider font-mono text-zinc-400">01. Premium Performance Coating</h3>
                   <div className="space-y-3">
-                    {['CANADIAN_MAPLE', 'PRO_ACRYLIC', 'PP_TILES', 'COMPOSITE_TURF'].map((key) => {
+                    {Object.keys(SURFACE_MATERIALS).filter((key) => {
+                      if (sportType === 'SWIMMING_POOL') {
+                        return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(key);
+                      } else if (sportType === 'SQUASH') {
+                        return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(key);
+                      } else if (sportType === 'FOOTBALL') {
+                        return ['COMPOSITE_TURF'].includes(key);
+                      } else if (sportType === 'TRACK_FIELD') {
+                        return !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(key);
+                      } else {
+                        return !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(key);
+                      }
+                    }).map((key) => {
                       const m = SURFACE_MATERIALS[key];
                       const active = surfaceMaterial === key;
                       return (
@@ -385,7 +437,21 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                 <div className="space-y-4">
                   <h3 className="text-xs uppercase tracking-wider font-mono text-zinc-400">02. Foundation Subbase Civil Slab</h3>
                   <div className="space-y-3">
-                    {['POST_TENSION_CONCRETE', 'ASPHALT', 'COMPACTED_STONE', 'SUSPENDED_DECK'].map((key) => {
+                    {Object.keys(SUB_BASES).filter((key) => {
+                      if (sportType === 'FOOTBALL') {
+                        return ['FOOTBALL_DRAINAGE_AGGREGATE', 'FOOTBALL_SHOCKPAD_BASE'].includes(key);
+                      } else if (sportType === 'CRICKET') {
+                        return ['CRICKET_HEAVY_CLAY', 'CRICKET_COMPACT_STONE'].includes(key);
+                      } else if (sportType === 'GYM') {
+                        return ['GYM_ACOUSTIC_SLAB', 'GYM_RUBBER_DAMPENING'].includes(key);
+                      } else if (sportType === 'SWIMMING_POOL') {
+                        return ['POOL_SHOTCRETE_SHELL', 'POOL_POURED_CONCRETE'].includes(key);
+                      } else if (sportType === 'SQUASH') {
+                        return ['SQUASH_DOUBLE_BATTEN', 'SQUASH_SINGLE_ELASTIC'].includes(key);
+                      } else {
+                        return ['POST_TENSION_CONCRETE', 'ASPHALT', 'COMPACTED_STONE', 'SUSPENDED_DECK'].includes(key);
+                      }
+                    }).map((key) => {
                       const b = SUB_BASES[key];
                       const active = subbase === key;
                       return (
@@ -399,7 +465,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                           <div>
                             <span className="font-bold text-sm tracking-tight block uppercase">{b.name}</span>
                             <span className={`text-[10px] font-mono uppercase ${active ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                              Est: ₹{b.costPerSqFt}/sqft &bull; {b.durability.split(' ')[0]}
+                              Est: ₹{b.costPerSqFt}/sqft &bull; {b.durability.split(' &bull; ')[0]}
                             </span>
                           </div>
                           {active && <CheckCircle2 className="h-5 w-5 text-black shrink-0 ml-2" />}
@@ -685,6 +751,18 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                     )}
                     {surfaceMaterial === 'COMPOSITE_TURF' && (
                       <p>FIFA grade synthetic grass turf demands professional silica and cooling sand compaction. Ensure localized heavy soil compaction is handled with vibratory steel drums to maintain optimal true-rolling ball physics.</p>
+                    )}
+                    {surfaceMaterial === 'MOSAIC_CLASSIC' && (
+                      <p>Royal Mosaic Ceramic & Glass Tiles require premium grade high-density shotcrete concrete structures. Always verify complete subbase moisture sealing to avoid calcium leaching or grout peeling from continuous chlorine/bromine water chemistry exposure.</p>
+                    )}
+                    {surfaceMaterial === 'GLASS_BEAD_PLASTER' && (
+                      <p>Premium Quartz & Glass Bead Plaster must be spray-applied and hand-troweled under optimal thermal shelter. Strictly monitor water calcium hardness and pH values during the initial 30 days of filling to prevent surface etching.</p>
+                    )}
+                    {surfaceMaterial === 'REINFORCED_PVC_LINER' && (
+                      <p>Heavy-Duty Reinforced PVC Liner welding requires a fully debris-free dry substrate. Ensure protective geofleece membranes are correctly underlaid to prevent underground pebble wear and maintain dynamic thermal elasticity.</p>
+                    )}
+                    {surfaceMaterial === 'ARMOURCOAT_WALLS' && (
+                      <p>Armourcoat Squash Wall Plaster requires a perfectly level substrate with maximum 2mm deflection over standard WSF height criteria. Adequate structural backing cure is critical to prevent acoustic dead spots during heavy ball rebounds.</p>
                     )}
                   </div>
                 </div>
