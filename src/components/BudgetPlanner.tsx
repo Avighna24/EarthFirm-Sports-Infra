@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES } from '../constants';
 import { SportType, SurfaceMaterialType, SubbaseType } from '../types';
+import { saveDocument } from '../firebase';
 
 interface BudgetPlannerProps {
   onBackToMain: () => void;
@@ -135,19 +136,39 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   const minCostRange = Math.round(projectTotal * 0.95);
   const maxCostRange = Math.round(projectTotal * 1.05);
 
-  const handleSubmitPlanning = (e: React.FormEvent) => {
+  const handleSubmitPlanning = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !location) {
       alert(language === 'hi' ? 'कृपया आवश्यक संपर्क फ़ील्ड भरें।' : 'Please fill in the required contact fields to view your expert plan.');
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
-      const code = `EF-PLAN-${sportType.substring(0, 3)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-      setSubmissionCode(code);
+
+    const code = `EF-PLAN-${sportType.substring(0, 3)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    setSubmissionCode(code);
+
+    try {
+      await saveDocument('budget_rfps', code, {
+        sportType: sportType,
+        length: Number(length),
+        width: Number(width),
+        surfaceMaterial: surfaceMaterial,
+        subbase: subbase,
+        budgetTier: budgetTier,
+        fullName: fullName,
+        email: email,
+        phone: phone || null,
+        location: location,
+        timeline: timeline,
+        projectTotalCost: Number(projectTotal),
+        submissionCode: code
+      });
+    } catch (err) {
+      console.error('Error saving budget plan to Firestore:', err);
+    } finally {
       setIsSubmitting(false);
       setStep(5);
-    }, 1500);
+    }
   };
 
   const handlePrint = () => {

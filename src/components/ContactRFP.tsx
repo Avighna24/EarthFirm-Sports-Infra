@@ -8,6 +8,7 @@ import { CourtConfiguration } from '../types';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES, SMART_FEATURES } from '../constants';
 import { Mail, Phone, MapPin, Sparkles, Clock, CheckCircle2, FileText, Download, Briefcase, Landmark } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
+import { saveDocument } from '../firebase';
 
 interface ContactRFPProps {
   config: CourtConfiguration;
@@ -44,7 +45,7 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
   const installationLabor = 5000 + (areaSqFt * 3.80);
   const totalCost = surfaceCost + subbaseCost + smartFeaturesCost + markingAndFittings + installationLabor;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !location) {
       alert('Please compile the required client fields to calculate proposal!');
@@ -52,15 +53,34 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
     }
 
     setIsSubmitting(true);
-    // Simulate API registration lag
-    setTimeout(() => {
-      // Create a unique design token
-      const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const code = `EFIC-${config.sportType.substring(0,3)}-${randomId}`;
-      setHashCode(code);
+    const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const code = `EFIC-${config.sportType.substring(0,3)}-${randomId}`;
+    setHashCode(code);
+
+    try {
+      await saveDocument('interactive_consultations', code, {
+        sportType: config.sportType,
+        length: Number(config.length),
+        width: Number(config.width),
+        surfaceMaterial: config.surfaceMaterial,
+        subbase: config.subbase,
+        selectedSmartFeatures: config.selectedSmartFeatures || [],
+        fullName: fullName,
+        email: email,
+        phone: phone || null,
+        location: location,
+        intendedUse: intendedUse,
+        timeline: timeline,
+        additionalNotes: additionalNotes || null,
+        totalCost: Number(totalCost),
+        hashCode: code
+      });
+    } catch (err) {
+      console.error('Error saving interactive design RFP:', err);
+    } finally {
       setIsSubmitting(false);
       setProposalSubmitted(true);
-    }, 1200);
+    }
   };
 
   const handlePrint = () => {

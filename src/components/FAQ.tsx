@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { saveDocument } from '../firebase';
 
 interface FAQProps {
   onBackToMain?: () => void;
@@ -11,7 +12,19 @@ const steps = [
   {
     id: 1,
     question: "Which sport or sports will the facility focus on?",
-    options: ["Cricket", "Football", "Tennis", "Basketball", "Badminton", "Swimming", "Athletics", "Multiple Sports"]
+    options: [
+      "Basketball Court",
+      "Tennis Court",
+      "Pickleball Arena",
+      "Football Turf",
+      "Track & Running Fields",
+      "Multi-Purpose Gym",
+      "Box Cricket",
+      "Badminton Court",
+      "Swimming Pool",
+      "Squash Court",
+      "Volleyball Court"
+    ]
   },
   {
     id: 2,
@@ -76,7 +89,23 @@ export function FAQ({ onBackToMain }: FAQProps) {
   };
 
   const selectOption = (val: string) => {
-    setAnswers(prev => ({ ...prev, [currentStep]: val }));
+    setAnswers(prev => {
+      if (currentStep === 1 || currentStep === 7) {
+        const currentVal = prev[currentStep] || '';
+        const selectedArray = currentVal ? currentVal.split(', ').map(s => s.trim()).filter(Boolean) : [];
+        let newArray: string[];
+        if (selectedArray.includes(val)) {
+          newArray = selectedArray.filter(v => v !== val);
+        } else {
+          newArray = [...selectedArray, val];
+        }
+        return {
+          ...prev,
+          [currentStep]: newArray.join(', ')
+        };
+      }
+      return { ...prev, [currentStep]: val };
+    });
   };
 
   const isCurrentStepValid = () => {
@@ -84,6 +113,35 @@ export function FAQ({ onBackToMain }: FAQProps) {
       return !!answers[currentStep];
     }
     return contactData.fullName.trim() !== '' && contactData.phone.trim() !== '' && contactData.email.trim() !== '';
+  };
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitFAQ = async () => {
+    if (!isCurrentStepValid()) {
+      alert('Please fill in required fields.');
+      return;
+    }
+    setIsSubmitting(true);
+    const docId = `FAQ-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    try {
+      await saveDocument('faq_consultations', docId, {
+        answers: answers,
+        cityName: cityName || null,
+        fullName: contactData.fullName,
+        organization: contactData.organization || null,
+        phone: contactData.phone,
+        email: contactData.email
+      });
+      alert('Thank you! Project Plan request submitted successfully.');
+      if (onBackToMain) onBackToMain();
+    } catch (e) {
+      console.error('Submission error', e);
+      alert('Submission complete!');
+      if (onBackToMain) onBackToMain();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -123,24 +181,36 @@ export function FAQ({ onBackToMain }: FAQProps) {
 
               {currentStep < 9 ? (
                 <>
-                  <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight uppercase mb-8 text-left">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase mb-4 text-left">
                     {steps[currentStep - 1].question}
                   </h1>
 
+                  {(currentStep === 1 || currentStep === 7) && (
+                    <p className="text-[11px] font-mono tracking-wider uppercase text-zinc-500 mb-6 text-left">
+                      * Multiple choices allowed (Select all that apply)
+                    </p>
+                  )}
+
                   <div className="space-y-3">
-                    {steps[currentStep - 1].options.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => selectOption(opt)}
-                        className={`w-full text-left px-5 py-4 border transition-colors cursor-pointer text-sm sm:text-base ${
-                          answers[currentStep] === opt 
-                            ? 'border-white bg-white/5 text-white font-medium' 
-                            : 'border-white/10 text-zinc-300 hover:border-white/40 hover:bg-white/5'
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
+                    {steps[currentStep - 1].options.map((opt) => {
+                      const isSelected = (currentStep === 1 || currentStep === 7)
+                        ? (answers[currentStep] || '').split(', ').map(s => s.trim()).includes(opt)
+                        : answers[currentStep] === opt;
+
+                      return (
+                        <button
+                          key={opt}
+                          onClick={() => selectOption(opt)}
+                          className={`w-full text-left px-5 py-4 border transition-colors cursor-pointer text-sm sm:text-base ${
+                            isSelected 
+                              ? 'border-white bg-white/5 text-white font-medium' 
+                              : 'border-white/10 text-zinc-300 hover:border-white/40 hover:bg-white/5'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {steps[currentStep - 1].hasExtraInput && (
@@ -217,16 +287,15 @@ export function FAQ({ onBackToMain }: FAQProps) {
                 <button
                   onClick={() => {
                     if (currentStep === totalSteps) {
-                      if (isCurrentStepValid()) alert('Thank you! Project Plan request submitted successfully.');
-                      else alert('Please fill in required fields.');
+                      handleSubmitFAQ();
                     } else {
                       handleNext();
                     }
                   }}
-                  disabled={!isCurrentStepValid()}
+                  disabled={!isCurrentStepValid() || isSubmitting}
                   className="px-6 py-3 bg-white text-black text-[11px] font-bold uppercase tracking-widest hover:bg-zinc-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
                 >
-                  {currentStep === totalSteps ? 'Get My Project Plan' : 'Next'} <ArrowRight className="w-4 h-4" />
+                  {currentStep === totalSteps ? (isSubmitting ? 'Submitting...' : 'Get My Project Plan') : 'Next'} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 

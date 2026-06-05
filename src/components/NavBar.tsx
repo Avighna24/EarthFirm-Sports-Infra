@@ -46,7 +46,7 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8 lg:gap-12">
           <button
-            onClick={() => handleNavClick('about-us', '/')}
+            onClick={() => onNavigateTo('/about-us')}
             data-testid="nav-about"
             className="text-sm font-semibold tracking-wider uppercase text-gray-400 hover:text-white cursor-pointer transition-colors whitespace-nowrap"
           >
@@ -106,7 +106,7 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
           >
             <div className="flex flex-col gap-1 px-4 py-6 text-center">
               <button
-                onClick={() => handleNavClick('about-us', '/')}
+                onClick={() => handleMobileRouteClick('/about-us')}
                 className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
               >
                 About Us

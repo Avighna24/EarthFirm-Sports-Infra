@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, PhoneCall, Mail, Navigation, Calendar, X, CheckSquare, ShieldCheck, Sparkles, User, Phone, MapPin, Send } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import { saveDocument } from '../firebase';
 
 interface FloatingActionsProps {
   onScrollToContact: (elementId: string) => void;
@@ -51,22 +52,34 @@ export function FloatingActions({ onScrollToContact }: FloatingActionsProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       // Generate unique booking number
       const randomNum = Math.floor(1000 + Math.random() * 9000);
-      setBookingId(`EF-${new Date().getFullYear()}-${randomNum}`);
+      const bId = `EF-${new Date().getFullYear()}-${randomNum}`;
+      setBookingId(bId);
       setIsSubmitted(true);
       
       // Save locally (persistence)
       const cachedCons = JSON.parse(localStorage.getItem('premium_consultations') || '[]');
-      cachedCons.push({
-        id: `EF-${new Date().getFullYear()}-${randomNum}`,
+      const newEntry = {
+        id: bId,
         ...formData,
         dateSubmitted: new Date().toISOString()
-      });
+      };
+      cachedCons.push(newEntry);
       localStorage.setItem('premium_consultations', JSON.stringify(cachedCons));
+
+      // Save securely to Cloud Firestore separately
+      await saveDocument('floating_consultations', bId, {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        location: formData.location,
+        sportType: formData.sportType,
+        notes: formData.notes
+      });
     }
   };
 
@@ -89,11 +102,17 @@ export function FloatingActions({ onScrollToContact }: FloatingActionsProps) {
 
   const sportsOptions = [
     { value: 'BASKETBALL', label: 'Basketball Court' },
-    { value: 'CRICKET', label: 'Cricket Turf / Nets' },
-    { value: 'TENNIS', label: 'Tennis Arena' },
-    { value: 'BADMINTON', label: 'Badminton / Multi-sport' },
-    { value: 'FOOTBALL', label: 'Football / Futsal Field' },
-    { value: 'OTHER', label: 'Other Sports Infrastructure' }
+    { value: 'TENNIS', label: 'Tennis Court' },
+    { value: 'PICKLEBALL', label: 'Pickleball Arena' },
+    { value: 'FOOTBALL', label: 'Football Turf' },
+    { value: 'TRACK_FIELD', label: 'Track & Running Fields' },
+    { value: 'GYM', label: 'Multi-Purpose Gym' },
+    { value: 'CRICKET', label: 'Box Cricket' },
+    { value: 'BADMINTON', label: 'Badminton Court' },
+    { value: 'SWIMMING_POOL', label: 'Swimming Pool' },
+    { value: 'SQUASH', label: 'Squash Court' },
+    { value: 'VOLLEYBALL', label: 'Volleyball Court' },
+    { value: 'OTHER', label: 'Other Infrastructure' }
   ];
 
   return (

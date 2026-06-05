@@ -80,19 +80,37 @@ export default function App() {
     }
   };
 
-  const [activeConfig, setActiveConfig] = useState<CourtConfiguration>({
-    sportType: 'BASKETBALL',
-    length: 94,
-    width: 50,
-    surfaceMaterial: 'CANADIAN_MAPLE',
-    primaryColor: 'blue',
-    secondaryColor: 'gray',
-    lineColor: '#ffffff',
-    subbase: 'POST_TENSION_CONCRETE',
-    selectedSmartFeatures: ['PERIPHERAL_FENCING', 'SMART_FLOODLIGHTS'],
-    visualizePlayers: true,
-    animatePlayers: true
+  const [activeConfig, setActiveConfig] = useState<CourtConfiguration>(() => {
+    try {
+      const saved = localStorage.getItem('earthfirm_court_config');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Error parsing saved config from localStorage', e);
+    }
+    return {
+      sportType: 'BASKETBALL',
+      length: 94,
+      width: 50,
+      surfaceMaterial: 'CANADIAN_MAPLE',
+      primaryColor: 'blue',
+      secondaryColor: 'gray',
+      lineColor: '#ffffff',
+      subbase: 'POST_TENSION_CONCRETE',
+      selectedSmartFeatures: ['PERIPHERAL_FENCING', 'SMART_FLOODLIGHTS'],
+      visualizePlayers: true,
+      animatePlayers: true
+    };
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('earthfirm_court_config', JSON.stringify(activeConfig));
+    } catch (e) {
+      console.error('Error saving config to localStorage', e);
+    }
+  }, [activeConfig]);
 
   const scrollSmoothTo = (elementId: string) => {
     const el = document.getElementById(elementId);
@@ -102,7 +120,7 @@ export default function App() {
   };
 
   const handleScrollToContact = (elementId: string) => {
-    if (isPlanningPage || isFAQPage) {
+    if (isPlanningPage || isFAQPage || isAboutPage) {
       navigateTo('/');
       setTimeout(() => {
         scrollSmoothTo(elementId);
@@ -115,6 +133,7 @@ export default function App() {
   // Check if current page is the Budget Planning page (pathname or custom parameter)
   const isPlanningPage = currentPath === '/budget-planning' || currentPath === '/budget-planning/';
   const isFAQPage = currentPath === '/faq' || currentPath === '/faq/';
+  const isAboutPage = currentPath === '/about-us' || currentPath === '/about-us/';
 
   if (isPlanningPage) {
     return (
@@ -131,6 +150,16 @@ export default function App() {
       <div className="flex flex-col min-h-screen font-sans">
         <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
         <FAQ onBackToMain={() => navigateTo('/')} language={language} />
+        <FloatingActions onScrollToContact={handleScrollToContact} />
+      </div>
+    );
+  }
+
+  if (isAboutPage) {
+    return (
+      <div className="flex flex-col min-h-screen font-sans">
+        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+        <AboutUs onBackToMain={() => navigateTo('/')} />
         <FloatingActions onScrollToContact={handleScrollToContact} />
       </div>
     );
@@ -157,16 +186,6 @@ export default function App() {
             }, 80);
           }}
         />
-      </motion.div>
-
-      {/* ABOUT US SECTION */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
-      >
-        <AboutUs />
       </motion.div>
 
       {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
