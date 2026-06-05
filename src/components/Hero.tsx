@@ -164,8 +164,12 @@ export const Hero: React.FC<HeroProps> = ({ onStartCustomizer, onViewCatalog }) 
               </span>
 
               {/* Main Heading styled for premium impact */}
-              <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black tracking-tighter uppercase mb-6 text-white leading-[0.9] whitespace-pre-line">
-                {language === 'hi' ? currentSlide.titleHi : currentSlide.title}
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter uppercase mb-10 text-white leading-[0.95] flex flex-col gap-2">
+                {(language === 'hi' ? currentSlide.titleHi : currentSlide.title).split('\n').map((line, idx) => (
+                  <span key={idx} className="block whitespace-nowrap">
+                    {line}
+                  </span>
+                ))}
               </h1>
 
               {/* Context Description */}
