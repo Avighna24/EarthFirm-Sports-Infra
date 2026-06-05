@@ -412,19 +412,161 @@ export const SUB_BASES: Record<string, SubbaseDetails> = {
 };
 
 export const SMART_FEATURES: SmartFeature[] = [
-  {
-    id: 'PERIPHERAL_FENCING',
-    name: 'Peripheral Fencing and Netting',
-    description: 'Heavy-duty steel wire boundary fencing coupled with upper-level soft mesh safety netting to isolate balls and elevate structural safety.',
-    cost: 150000,
-    category: 'Hardware'
-  },
+  // General options
   {
     id: 'SMART_FLOODLIGHTS',
     name: 'Solar-Charged Smart LED Floodlights',
     description: 'Quad solar-integrated columns throwing over 50,000 lumens. Features automated darkness sensors, smartphone brightness limits, and structural tilt control.',
     cost: 480000,
-    category: 'Lighting'
+    category: 'Lighting',
+    sports: ['BASKETBALL', 'TENNIS', 'PICKLEBALL', 'FOOTBALL', 'TRACK_FIELD', 'CRICKET', 'BADMINTON', 'VOLLEYBALL']
+  },
+  {
+    id: 'AUTOMATED_DRAINAGE',
+    name: 'Smart Subsurface Stormwater Drainage Pump',
+    description: 'Automated hydraulic sensors integrated within civil sub-base grids to evacuate water logging instantly under extreme rains.',
+    cost: 280000,
+    category: 'Hardware',
+    sports: ['BASKETBALL', 'TENNIS', 'PICKLEBALL', 'FOOTBALL', 'TRACK_FIELD', 'CRICKET', 'BADMINTON', 'VOLLEYBALL']
+  },
+  // Basketball specific
+  {
+    id: 'BASKETBALL_HOOPS',
+    name: 'Hydraulic Tempered Glass Goals Set',
+    description: 'Dual professional height-adjustable hoops with heavy-duty structural wrap cushioning and dynamic dunk-spring rim systems.',
+    cost: 180000,
+    category: 'Hardware',
+    sports: ['BASKETBALL']
+  },
+  // Tennis specific
+  {
+    id: 'TENNIS_NETS',
+    name: 'Pro Tensioned Steel Net Post Columns',
+    description: 'Internal brass winding gears, UV-stabilized tennis net mesh, and rigid high-tension aluminum sleeve posts.',
+    cost: 95000,
+    category: 'Hardware',
+    sports: ['TENNIS']
+  },
+  // Pickleball specific
+  {
+    id: 'PICKLEBALL_POSTS',
+    name: 'Modular Portable Heavy Duty Net System',
+    description: 'Precision ground anchor sleeves, heavy duty pickleball net with centered steel buckle adjustments.',
+    cost: 75000,
+    category: 'Hardware',
+    sports: ['PICKLEBALL']
+  },
+  // Football specific
+  {
+    id: 'FOOTBALL_GOALS',
+    name: 'FIFA Spec Anti-Rust Heavy Steel Goals',
+    description: 'Pair of Olympic white-finished box goalframes complete with tear-proof braided nylon mesh and deep ground stakes.',
+    cost: 140000,
+    category: 'Hardware',
+    sports: ['FOOTBALL']
+  },
+  // Track specific
+  // Gym specific
+  {
+    id: 'GYM_RACKS',
+    name: 'Interlocked Olympic Weight Station Cages',
+    description: 'Tough structural iron power racks fitted with heavy vulcanized anti-vibration drop platforms for barbell dampening.',
+    cost: 250000,
+    category: 'Hardware',
+    sports: ['GYM']
+  },
+  {
+    id: 'GYM_MIRRORS',
+    name: 'Full Height Posture Smart Training Mirrors',
+    description: 'Integrated ambient backlighting combined with custom grid accents to monitor body geometry and technique.',
+    cost: 130000,
+    category: 'Tech',
+    sports: ['GYM']
+  },
+  // Cricket specific
+  {
+    id: 'CRICKET_NET',
+    name: 'Ceiling Rail Retractable Practice Netting',
+    description: 'Structural nylon drop nets sliding along heavy overhead rails, allowing instant conversion of multi-sport areas.',
+    cost: 115000,
+    category: 'Hardware',
+    sports: ['CRICKET']
+  },
+  // Badminton specific
+  {
+    id: 'BADMINTON_POSTS',
+    name: 'BWF Class Heavy Free-Standing Post Set',
+    description: 'Counterweighted rigid gold-sleeve posts with Olympic specifications nylon nets and adjustable cord tensioning.',
+    cost: 65000,
+    category: 'Hardware',
+    sports: ['BADMINTON']
+  },
+  {
+    id: 'BADMINTON_LIGHT',
+    name: 'Anti-Glare Underlay Directional LED Tubes',
+    description: 'Bespoke sideline-focused LED lights projecting completely glare-free brightness to ensure high birdie visibility.',
+    cost: 155000,
+    category: 'Lighting',
+    sports: ['BADMINTON']
+  },
+  // Volleyball specific
+  {
+    id: 'VOLLEYBALL_POSTS',
+    name: 'Telescopic Carbon-Fiber Net Posts',
+    description: 'Integrated rope winch gears, protective pad sleeves, and precise sliding heights for mens/womens regulation play.',
+    cost: 85000,
+    category: 'Hardware',
+    sports: ['VOLLEYBALL']
+  },
+  {
+    id: 'VOLLEYBALL_NETTING',
+    name: 'Sands level adjustment boundaries kit',
+    description: 'Heavy duty web border tapes with robust sand disc anchors, plus professional mesh net netting and cables.',
+    cost: 110000,
+    category: 'Hardware',
+    sports: ['VOLLEYBALL']
+  },
+  // Swimming Pool specific
+  {
+    id: 'POOL_LIGHTS',
+    name: 'Multi-Color Submarine LED Underwater Lights',
+    description: 'High-intensity submerged LED lighting system with vibrant color presets and waterproof safety transformers.',
+    cost: 120000,
+    category: 'Lighting',
+    sports: ['SWIMMING_POOL']
+  },
+  {
+    id: 'POOL_PUMPS_FILTER',
+    name: 'High-Performance Filtration and Circulation Pump System',
+    description: 'Heavy-duty saltwater-rated quiet water pump paired with sand filters to ensure pristine crystal-clear water flow.',
+    cost: 210000,
+    category: 'Hardware',
+    sports: ['SWIMMING_POOL']
+  },
+  {
+    id: 'POOL_HEATER',
+    name: 'Titanium Water Thermal Heat Pump System',
+    description: 'Industrial-grade titanium heat exchanger pumps designed for consistent year-round pool temperature regulation.',
+    cost: 430000,
+    category: 'Hardware',
+    sports: ['SWIMMING_POOL']
+  },
+  // Squash specific
+  {
+    id: 'SQUASH_GLASS',
+    name: 'WSF Heavy Toughened Glass Rebound Wall',
+    description: '12mm structural glass back door system featuring high-tension flush fittings, hardware, and safety floor anchors.',
+    cost: 380000,
+    category: 'Hardware',
+    sports: ['SQUASH']
+  },
+  {
+    id: 'SQUASH_AC',
+    name: 'Dehumidifying Air-Handler Climate Unit',
+    description: 'Specialized low-velocity ventilation unit maintaining ideal 45% moisture levels to keep maple hardwood dry and grippy.',
+    cost: 250000,
+    category: 'Ecosystem',
+    sports: ['SQUASH']
   }
 ];
 

@@ -37,6 +37,7 @@ export interface SmartFeature {
   description: string;
   cost: number;
   category: 'Tech' | 'Hardware' | 'Lighting' | 'Ecosystem';
+  sports?: string[];
 }
 
 export type SubbaseType = 

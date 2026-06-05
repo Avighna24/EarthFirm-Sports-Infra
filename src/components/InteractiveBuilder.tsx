@@ -94,6 +94,9 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
     setWidth(preset.defaultDimensions.width);
     setVisualWidth(preset.defaultDimensions.width);
 
+    // Reset selected smart features/accessories on changing sport types to prevent bad state
+    setSelectedSmartFeatures([]);
+
     // Dynamic defaults for sports
     if (type === 'FOOTBALL') {
       setSurfaceMaterial('COMPOSITE_TURF');
@@ -324,30 +327,30 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
 
               {/* Material Radios */}
               <div className="space-y-3">
-                {Object.values(SURFACE_MATERIALS).map((material) => {
+                {Object.values(SURFACE_MATERIALS).filter((material) => {
+                  if (sportType === 'SWIMMING_POOL') {
+                    return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(material.id);
+                  } else if (sportType === 'SQUASH') {
+                    return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(material.id);
+                  } else if (sportType === 'FOOTBALL') {
+                    return ['COMPOSITE_TURF'].includes(material.id);
+                  } else if (sportType === 'TRACK_FIELD') {
+                    return !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
+                  } else {
+                    return !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
+                  }
+                }).map((material) => {
                   const isSelected = surfaceMaterial === material.id;
-                  const isCompatible = sportType === 'SWIMMING_POOL'
-                    ? ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(material.id)
-                    : sportType === 'SQUASH'
-                      ? ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(material.id)
-                      : sportType === 'FOOTBALL' 
-                        ? material.id === 'COMPOSITE_TURF' 
-                        : sportType === 'TRACK_FIELD' 
-                          ? !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id)
-                          : !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
 
                   return (
                     <button
                       key={material.id}
-                      disabled={!isCompatible}
                       onClick={() => setSurfaceMaterial(material.id)}
                       id={`surface-opt-${material.id}`}
                       className={`flex flex-col sm:flex-row justify-between text-left p-4 rounded-2xl border transition w-full ${
                         isSelected
                           ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
-                          : !isCompatible
-                            ? 'opacity-40 bg-stone-150/40 border-stone-200 cursor-not-allowed text-stone-400'
-                            : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone cursor-pointer'
+                          : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone cursor-pointer'
                       }`}
                     >
                       <div className="mb-2 sm:mb-0 w-full">
@@ -493,7 +496,9 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {SMART_FEATURES.map((feature) => {
+                {SMART_FEATURES.filter((feature) => {
+                  return !feature.sports || feature.sports.includes(sportType);
+                }).map((feature) => {
                   const isChecked = selectedSmartFeatures.includes(feature.id);
                   return (
                     <div
