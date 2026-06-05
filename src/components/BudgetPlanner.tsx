@@ -280,7 +280,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
               <div className="bg-neutral-950/90 border border-neutral-900 rounded-3xl p-6 sm:p-8 space-y-8">
                 
                 {/* Physical Preset buttons */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     onClick={() => {
                       setLength(Math.round(sportPreset.minDimensions.length));

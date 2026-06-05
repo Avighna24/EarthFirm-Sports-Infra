@@ -1295,7 +1295,7 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
 
 export const CourtVisualizer: React.FC<VisualizerProps> = ({ config }) => {
   return (
-    <div className="relative w-full aspect-[5/3] bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center p-0 border border-zinc-800">
+    <div className="relative w-full aspect-[4/3] sm:aspect-[5/3] bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center p-0 border border-zinc-800">
       
       <Canvas shadows camera={{ position: [0, 9, 15], fov: 45 }}>
         <color attach="background" args={['#09090b']} />

@@ -527,7 +527,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
           </div>
 
           {/* RIGHT PANEL: STICKY LIVE SIMULATION & DETAILED FINANCIAL SPEC (lg:col-span-5) */}
-          <motion.div variants={staggerItem} className="lg:col-span-12 xl:col-span-5 lg:sticky lg:top-8 space-y-6">
+          <motion.div variants={staggerItem} className="lg:col-span-5 lg:sticky lg:top-8 space-y-6">
             
             {/* Live simulation */}
             <div className="space-y-4">
