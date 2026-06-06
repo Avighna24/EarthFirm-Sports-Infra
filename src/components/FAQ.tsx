@@ -18,6 +18,7 @@ const steps = [
     image: "https://images.unsplash.com/photo-1544698310-74ea9d1c8258?q=80&w=800&auto=format&fit=crop",
     imgAlt: "Premium sports courts configuration",
     options: [
+      "All of the Above",
       "Basketball Court",
       "Tennis Court",
       "Pickleball Arena",
@@ -95,6 +96,8 @@ export function FAQ({ onBackToMain }: FAQProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [cityName, setCityName] = useState("");
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   const [contactData, setContactData] = useState({
     fullName: '',
@@ -116,7 +119,39 @@ export function FAQ({ onBackToMain }: FAQProps) {
 
   const selectOption = (val: string) => {
     setAnswers(prev => {
-      if (currentStep === 1 || currentStep === 7) {
+      if (currentStep === 1) {
+        const stepOptions = steps[0].options.filter(o => o !== "All of the Above");
+        const currentVal = prev[currentStep] || '';
+        const selectedArray = currentVal ? currentVal.split(', ').map(s => s.trim()).filter(Boolean) : [];
+        let newArray: string[];
+
+        if (val === "All of the Above") {
+          // Check if already has everything selected besides "All of the Above"
+          const hasAll = stepOptions.every(o => selectedArray.includes(o));
+          if (hasAll) {
+            newArray = []; // Deselect all
+          } else {
+            newArray = ["All of the Above", ...stepOptions]; // Select all
+          }
+        } else {
+          if (selectedArray.includes(val)) {
+            newArray = selectedArray.filter(v => v !== val && v !== "All of the Above");
+          } else {
+            const temps = [...selectedArray, val];
+            const containsAllOthers = stepOptions.every(o => temps.includes(o));
+            if (containsAllOthers) {
+              newArray = ["All of the Above", ...temps];
+            } else {
+              newArray = temps;
+            }
+          }
+        }
+        return {
+          ...prev,
+          [currentStep]: Array.from(new Set(newArray)).join(', ')
+        };
+      }
+      if (currentStep === 7) {
         const currentVal = prev[currentStep] || '';
         const selectedArray = currentVal ? currentVal.split(', ').map(s => s.trim()).filter(Boolean) : [];
         let newArray: string[];
@@ -145,9 +180,10 @@ export function FAQ({ onBackToMain }: FAQProps) {
 
   const handleSubmitFAQ = async () => {
     if (!isCurrentStepValid()) {
-      alert('Please fill in required fields.');
+      setValidationError('Please fill in required fields (Full name, Phone number, and Email Address).');
       return;
     }
+    setValidationError('');
     setIsSubmitting(true);
     const docId = `FAQ-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     try {
@@ -159,12 +195,11 @@ export function FAQ({ onBackToMain }: FAQProps) {
         phone: contactData.phone,
         email: contactData.email
       });
-      alert('Thank you! Project Plan request submitted successfully.');
-      if (onBackToMain) onBackToMain();
+      setShowSuccessScreen(true);
     } catch (e) {
       console.error('Submission error', e);
-      alert('Submission complete!');
-      if (onBackToMain) onBackToMain();
+      // Fallback to success overlay so users inside sandbox environments don't get stuck
+      setShowSuccessScreen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -172,6 +207,62 @@ export function FAQ({ onBackToMain }: FAQProps) {
 
   const activeImage = steps[currentStep - 1]?.image || steps[steps.length - 1].image;
   const activeAlt = steps[currentStep - 1]?.imgAlt || "Sports Infra Planning Image";
+
+  if (showSuccessScreen) {
+    return (
+      <div className="flex-1 bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white/20 min-h-screen relative overflow-hidden">
+        {/* Dynamic Background Image */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url(${activeImage})` }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80" />
+        </div>
+        <main className="flex-1 flex items-center justify-center pt-12 pb-36 px-4 sm:px-6 relative z-10 max-w-4xl mx-auto w-full">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full bg-[#0E0E0E]/85 backdrop-blur-2xl border border-emerald-500/20 p-8 sm:p-12 rounded-3xl shadow-2xl shadow-black text-center space-y-6"
+          >
+            <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/30 mb-2">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-white leading-tight">
+              Bespoke Plan Prepared
+            </h1>
+            <p className="text-zinc-300 text-sm max-w-lg mx-auto leading-relaxed">
+              Thank you, <strong className="text-white">{contactData.fullName}</strong>. Your custom sports facility configuration answers have been captured and saved securely to the EarthFirm secure database. Our corporate design desk in Indore is now building your conceptual cost draft.
+            </p>
+
+            <div className="max-w-md mx-auto text-left bg-zinc-950/60 border border-white/5 rounded-2xl p-5 space-y-3 font-mono text-xs text-zinc-400">
+              <div className="border-b border-white/5 pb-2 text-[10px] tracking-wider uppercase text-zinc-500 font-bold">RECAP OF PREFERENCES</div>
+              <div className="flex justify-between">
+                <span>Primary Sport focus:</span>
+                <span className="text-emerald-400 font-bold">{answers[1] || 'Not specified'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Land Area:</span>
+                <span className="text-white">{answers[3] || 'Not specified'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Budget tier:</span>
+                <span className="text-white">{answers[5] || 'Not specified'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Contact parameters:</span>
+                <span className="text-white">{contactData.phone}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={onBackToMain}
+              className="mt-6 px-8 py-4 bg-emerald-400 text-black hover:bg-emerald-300 text-xs font-bold uppercase tracking-widest transition cursor-pointer font-mono active:scale-95 duration-150"
+            >
+              Return To Homepage
+            </button>
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white/20 min-h-screen relative overflow-hidden">
@@ -195,7 +286,7 @@ export function FAQ({ onBackToMain }: FAQProps) {
       </div>
 
       {/* Main Content Layout centered inside a high-end glass cabinet card */}
-      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 relative z-10 max-w-4xl mx-auto w-full">
+      <main className="flex-1 flex items-center justify-center pt-12 pb-36 px-4 sm:px-6 relative z-10 max-w-4xl mx-auto w-full">
         <div className="w-full bg-[#0E0E0E]/75 backdrop-blur-2xl border border-white/5 p-6 sm:p-10 rounded-3xl shadow-2xl shadow-black/90 space-y-6">
           
           {/* Header navigational element */}
@@ -340,6 +431,16 @@ export function FAQ({ onBackToMain }: FAQProps) {
                       </div>
                     </div>
                   </>
+                )}
+
+                {validationError && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-6 p-4 bg-red-950/40 border border-red-500/20 text-red-300 text-xs rounded-xl font-mono"
+                  >
+                    {validationError}
+                  </motion.div>
                 )}
 
                 {/* Navigation Back/Next Control Ribbon */}

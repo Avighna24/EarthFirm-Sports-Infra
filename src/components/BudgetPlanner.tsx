@@ -22,6 +22,8 @@ import squashCourtImg from '../assets/images/squash_court_1780661148365.png';
 import boxCricketImg from '../assets/images/box_cricket_1780661166756.png';
 import footballTurfImg from '../assets/images/football_turf_1780661183867.png';
 import pickleballArenaImg from '../assets/images/pickleball_arena_stadium_1780662080721.png';
+import basketballCourtImg from '../assets/images/basketball_court_premium_1780724785961.png';
+import multipurposeCollageImg from '../assets/images/multipurpose_collage_1780662230085.png';
 
 interface BudgetPlannerProps {
   onBackToMain: () => void;
@@ -30,11 +32,11 @@ interface BudgetPlannerProps {
 
 const STEP_IMAGES = {
   0: {
-    url: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=800&auto=format&fit=crop",
+    url: multipurposeCollageImg,
     alt: "Tennis Court Synthetic Construction blueprint design"
   },
   1: {
-    url: "https://images.unsplash.com/photo-1519766304817-4f37bda74a27?q=80&w=800&auto=format&fit=crop",
+    url: multipurposeCollageImg,
     alt: "Sport category selection surface"
   },
   2: {
@@ -56,7 +58,7 @@ const STEP_IMAGES = {
 };
 
 const SPORT_BACKGROUNDS: Record<SportType, string> = {
-  BASKETBALL: "https://images.unsplash.com/photo-1544698310-74ea9d1c8258?q=80&w=1600&auto=format&fit=crop",
+  BASKETBALL: basketballCourtImg,
   TENNIS: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=1600&auto=format&fit=crop",
   PICKLEBALL: pickleballArenaImg,
   FOOTBALL: footballTurfImg,
@@ -75,7 +77,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   const [step, setStep] = useState<number>(0);
 
   // User input states
-  const [sportType, setSportType] = useState<SportType>('BASKETBALL');
+  const [sportType, setSportType] = useState<SportType | null>(null);
   const [length, setLength] = useState<number>(94);
   const [width, setWidth] = useState<number>(50);
   const [visualLength, setVisualLength] = useState<number>(94);
@@ -93,6 +95,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionCode, setSubmissionCode] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   // Debounce visual input changes to heavier calculations (80ms)
   useEffect(() => {
@@ -150,7 +153,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
 
   // Precalculated metrics
   const areaSqFt = length * width;
-  const sportPreset = SPORT_PRESETS[sportType];
+  const sportPreset = sportType ? SPORT_PRESETS[sportType] : SPORT_PRESETS['BASKETBALL'];
   const materialPreset = SURFACE_MATERIALS[surfaceMaterial];
   const subbasePreset = SUB_BASES[subbase];
 
@@ -172,10 +175,15 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
 
   const handleSubmitPlanning = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email || !location) {
-      alert(language === 'hi' ? 'कृपया आवश्यक संपर्क फ़ील्ड भरें।' : 'Please fill in the required contact fields to view your expert plan.');
+    if (!sportType) {
+      setValidationError('Please select a sport facility type first.');
       return;
     }
+    if (!fullName || !email || !location) {
+      setValidationError(language === 'hi' ? 'कृपया आवश्यक संपर्क फ़ील्ड भरें।' : 'Please fill in the required contact fields to view your expert plan.');
+      return;
+    }
+    setValidationError('');
     setIsSubmitting(true);
 
     const code = `EF-PLAN-${sportType.substring(0, 3)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
@@ -210,7 +218,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   };
 
   const currentStepImage = STEP_IMAGES[step as keyof typeof STEP_IMAGES] || STEP_IMAGES[0];
-  const bgImageUrl = SPORT_BACKGROUNDS[sportType] || "https://images.unsplash.com/photo-1544698310-74ea9d1c8258?q=80&w=1600&auto=format&fit=crop";
+  const bgImageUrl = (step === 0 || !sportType) ? multipurposeCollageImg : (SPORT_BACKGROUNDS[sportType] || multipurposeCollageImg);
 
   return (
     <div className="flex-1 bg-[#0A0A0A] text-white relative overflow-x-hidden font-sans select-none min-h-screen flex flex-col" data-testid="budget-planning-page">
@@ -234,7 +242,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
       </div>
 
       {/* Content Wrapper centered inside a high-end glass cabinet card */}
-      <div className="relative z-10 flex-grow flex items-center justify-center max-w-4xl mx-auto w-full px-4 sm:px-6 py-12">
+      <div className="relative z-10 flex-grow flex items-center justify-center max-w-4xl mx-auto w-full px-4 sm:px-6 pt-12 pb-36">
         <div className="w-full bg-[#0E0E0E]/75 backdrop-blur-2xl border border-white/5 p-6 sm:p-10 rounded-3xl shadow-2xl shadow-black/90 space-y-6">
           
           {/* Nav Back Header block */}
@@ -323,44 +331,59 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
 
                   {/* Sport Specific Live Media Showcase */}
                   <div className="lg:col-span-5">
-                    <div className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden shadow-lg h-full flex flex-col justify-between">
-                      <div className="relative h-44 w-full overflow-hidden">
-                        <img 
-                          src={SPORT_BACKGROUNDS[sportType]} 
-                          alt={sportPreset.name} 
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E0E] via-transparent to-transparent z-1" />
-                        <span className="absolute bottom-3 left-3 bg-red-500 text-white font-mono text-[9px] px-2.5 py-1 tracking-wider uppercase font-bold rounded-lg z-2">
-                          EST. ₹{sportPreset.basePricePerSqFt}/sqft
-                        </span>
-                      </div>
-                      <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-[#0E0E0E]/90">
-                        <div>
-                          <h4 className="text-base font-black uppercase text-white tracking-tight">{sportPreset.name}</h4>
-                          <p className="text-[11px] text-emerald-400 font-mono tracking-wide leading-snug">{sportPreset.tagline}</p>
-                          <p className="text-[11px] text-zinc-300 mt-2 leading-relaxed font-light line-clamp-3">{sportPreset.description}</p>
+                    {sportType && sportPreset ? (
+                      <div className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden shadow-lg h-full flex flex-col justify-between">
+                        <div className="relative h-44 w-full overflow-hidden">
+                          <img 
+                            src={SPORT_BACKGROUNDS[sportType]} 
+                            alt={sportPreset.name} 
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E0E] via-transparent to-transparent z-1" />
+                          <span className="absolute bottom-3 left-3 bg-red-500 text-white font-mono text-[9px] px-2.5 py-1 tracking-wider uppercase font-bold rounded-lg z-2">
+                            EST. ₹{sportPreset.basePricePerSqFt}/sqft
+                          </span>
                         </div>
-                        <div className="border-t border-white/5 pt-3 flex flex-col gap-1 text-[9px] text-neutral-400 font-mono">
-                          <div className="flex justify-between">
-                            <span>MIN CONSTRAINTS:</span>
-                            <span className="text-white">{sportPreset.minDimensions.length}&apos; &times; {sportPreset.minDimensions.width}&apos;</span>
+                        <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-[#0E0E0E]/90">
+                          <div>
+                            <h4 className="text-base font-black uppercase text-white tracking-tight">{sportPreset.name}</h4>
+                            <p className="text-[11px] text-emerald-400 font-mono tracking-wide leading-snug">{sportPreset.tagline}</p>
+                            <p className="text-[11px] text-zinc-300 mt-2 leading-relaxed font-light line-clamp-3">{sportPreset.description}</p>
                           </div>
-                          <div className="flex justify-between">
-                            <span>STANDARD DEFAULTS:</span>
-                            <span className="text-white">{sportPreset.defaultDimensions.length}&apos; &times; {sportPreset.defaultDimensions.width}&apos;</span>
+                          <div className="border-t border-white/5 pt-3 flex flex-col gap-1 text-[9px] text-neutral-400 font-mono">
+                            <div className="flex justify-between">
+                              <span>MIN CONSTRAINTS:</span>
+                              <span className="text-white">{sportPreset.minDimensions.length}&apos; &times; {sportPreset.minDimensions.width}&apos;</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>STANDARD DEFAULTS:</span>
+                              <span className="text-white">{sportPreset.defaultDimensions.length}&apos; &times; {sportPreset.defaultDimensions.width}&apos;</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden shadow-lg h-full flex flex-col items-center justify-center p-8 text-center text-zinc-500">
+                         <FileText className="w-8 h-8 mb-4 opacity-50" />
+                         <p className="text-xs font-mono uppercase tracking-widest leading-relaxed">
+                           PLEASE SELECT A<br/>SPORT MODULE TO VIEW DETAILS
+                         </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
+                {validationError && (
+                  <div className="mt-4 p-3 bg-red-950/40 border border-red-500/20 text-red-300 text-xs rounded-xl font-mono text-center">
+                    {validationError}
+                  </div>
+                )}
+
                 <div className="flex justify-end pt-4">
                   <button
-                    onClick={() => setStep(2)}
-                    className="bg-white text-black hover:bg-neutral-200 px-6 py-3 uppercase tracking-wider font-bold text-xs flex items-center gap-2 transition cursor-pointer"
+                    onClick={() => sportType ? (setValidationError(''), setStep(2)) : setValidationError('Please select a sport facility type first.')}
+                    className={`px-6 py-3 uppercase tracking-wider font-bold text-xs flex items-center gap-2 transition cursor-pointer ${sportType ? 'bg-white text-black hover:bg-neutral-200' : 'bg-white/20 text-white/50 cursor-not-allowed'}`}
                   >
                     Configure Dimensions
                     <ArrowRight className="h-4 w-4" />
@@ -473,7 +496,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                     <div className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden shadow-lg h-full flex flex-col justify-between">
                       <div className="relative h-32 w-full overflow-hidden">
                         <img 
-                          src={SPORT_BACKGROUNDS[sportType]} 
+                          src={sportType ? SPORT_BACKGROUNDS[sportType] : multipurposeCollageImg} 
                           alt={sportPreset.name} 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
@@ -749,6 +772,12 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                     </div>
 
                   </div>
+
+                  {validationError && (
+                    <div className="p-3 bg-red-950/40 border border-red-500/20 rounded-xl text-red-300 text-xs font-mono text-center">
+                      {validationError}
+                    </div>
+                  )}
 
                   <button
                     type="submit"

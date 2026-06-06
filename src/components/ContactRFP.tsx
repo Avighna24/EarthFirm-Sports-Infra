@@ -28,6 +28,7 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proposalSubmitted, setProposalSubmitted] = useState(false);
   const [hashCode, setHashCode] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   // Calculations for submitted brief
   const areaSqFt = config.length * config.width;
@@ -48,9 +49,10 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !location) {
-      alert('Please compile the required client fields to calculate proposal!');
+      setValidationError('Please compile the required client fields to calculate proposal!');
       return;
     }
+    setValidationError('');
 
     setIsSubmitting(true);
     const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -223,6 +225,12 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
                   className="w-full bg-brand-cream/50 border border-stone-200 focus:border-brand-sage focus:bg-white rounded-xl px-4 py-3 text-brand-stone text-sm focus:outline-none transition resize-none"
                 />
               </div>
+
+              {validationError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-mono text-center">
+                  {validationError}
+                </div>
+              )}
 
               {/* Action Button */}
               <button

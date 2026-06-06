@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { CourtConfiguration, SportType, SurfaceMaterialType, SubbaseType } from '../types';
 
 const staggerItem = {
@@ -86,6 +86,18 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
   }, [config]);
 
   // Handle manual sport selection resets in dimensions and material suggestions
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+
+  const getFeatureBenefit = (category: string) => {
+    switch (category) {
+      case 'Lighting': return 'Extends operational hours & safety visibility.';
+      case 'Hardware': return 'Minimizes maintenance frequency & protects structural integrity.';
+      case 'Tech': return 'Modernizes user experience & offers advanced athletic analytics.';
+      case 'Ecosystem': return 'Improves environmental integration & operational safety.';
+      default: return 'Increases overall asset functional lifespan.';
+    }
+  };
+
   const handleSelectSport = (type: SportType) => {
     setSportType(type);
     const preset = SPORT_PRESETS[type];
@@ -201,10 +213,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   const preset = SPORT_PRESETS[type];
                   const isSelected = sportType === type;
                   return (
-                    <button
+                    <motion.button
                       key={type}
                       onClick={() => handleSelectSport(type)}
                       id={`sport-opt-${type}`}
+                      whileHover={{ scale: 1.04, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-center transition cursor-pointer ${
                         isSelected
                           ? 'bg-brand-sage-soft border-brand-sage text-brand-sage'
@@ -215,7 +230,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                         {getSportIcon(type)}
                       </div>
                       <span className="text-xs font-bold font-sans tracking-wide block leading-snug">{preset.name}</span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -288,7 +303,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 {/* Size Presets buttons */}
                 <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-100">
                   <span className="text-[10px] text-stone-500 uppercase font-bold tracking-wider my-auto mr-1">Ratios:</span>
-                  <button
+                  <motion.button
                     onClick={() => {
                       setLength(currentSportPreset.minDimensions.length);
                       setVisualLength(currentSportPreset.minDimensions.length);
@@ -296,11 +311,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                       setVisualWidth(currentSportPreset.minDimensions.width);
                     }}
                     id="btn-ratio-compact"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     className="px-3 py-1.5 text-[10px] font-mono font-bold rounded-full bg-brand-cream hover:bg-stone-200/50 border border-stone-200 text-stone-605 transition cursor-pointer"
                   >
                     Compact ({currentSportPreset.minDimensions.length}x{currentSportPreset.minDimensions.width})
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={() => {
                       setLength(currentSportPreset.defaultDimensions.length);
                       setVisualLength(currentSportPreset.defaultDimensions.length);
@@ -308,10 +325,12 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                       setVisualWidth(currentSportPreset.defaultDimensions.width);
                     }}
                     id="btn-ratio-pro"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     className="px-3 py-1.5 text-[10px] font-mono font-bold rounded-full bg-brand-sage-soft border border-brand-sage text-brand-sage transition cursor-pointer"
                   >
                     Tournament Spec ({currentSportPreset.defaultDimensions.length}x{currentSportPreset.defaultDimensions.width})
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </motion.div>
@@ -343,10 +362,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   const isSelected = surfaceMaterial === material.id;
 
                   return (
-                    <button
+                    <motion.button
                       key={material.id}
                       onClick={() => setSurfaceMaterial(material.id)}
                       id={`surface-opt-${material.id}`}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.99 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       className={`flex flex-col sm:flex-row justify-between text-left p-4 rounded-2xl border transition w-full ${
                         isSelected
                           ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
@@ -364,7 +386,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                         </div>
                         <span className="text-xs text-stone-500 leading-snug block">{material.description}</span>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -376,17 +398,20 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">A. Inner Play Zone Color</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
-                      <button
+                      <motion.button
                         key={c.value}
                         title={c.name}
                         onClick={() => setPrimaryColor(c.value)}
+                        whileHover={{ scale: 1.25, zIndex: 10 }}
+                        whileTap={{ scale: 0.85 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
                         className={`w-7 h-7 rounded-full border-2 transition relative ${
                           primaryColor === c.value ? 'border-brand-sage scale-110 shadow-md' : 'border-stone-100/60 hover:border-stone-400'
                         }`}
                         style={{ backgroundColor: c.hex }}
                       >
                         {primaryColor === c.value && <Check className="h-3.5 w-3.5 text-white stroke-[3] absolute inset-0 m-auto" />}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -396,17 +421,20 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">B. Runout Margin Color</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
-                      <button
+                      <motion.button
                         key={c.value}
                         title={c.name}
                         onClick={() => setSecondaryColor(c.value)}
+                        whileHover={{ scale: 1.25, zIndex: 10 }}
+                        whileTap={{ scale: 0.85 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
                         className={`w-7 h-7 rounded-full border-2 transition relative ${
                           secondaryColor === c.value ? 'border-brand-sage scale-110 shadow-md' : 'border-stone-100/60 hover:border-stone-400'
                         }`}
                         style={{ backgroundColor: c.hex }}
                       >
                         {secondaryColor === c.value && <Check className="h-3.5 w-3.5 text-white stroke-[3] absolute inset-0 m-auto" />}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -416,17 +444,20 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">C. Line Marking Color</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
-                      <button
+                      <motion.button
                         key={c.value}
                         title={c.name}
                         onClick={() => setLineColor(c.value)}
+                        whileHover={{ scale: 1.25, zIndex: 10 }}
+                        whileTap={{ scale: 0.85 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
                         className={`w-7 h-7 rounded-full border-2 transition relative ${
                           lineColor === c.value ? 'border-brand-sage scale-110 shadow-md' : 'border-stone-100/60 hover:border-stone-400'
                         }`}
                         style={{ backgroundColor: c.hex }}
                       >
                         {lineColor === c.value && <Check className="h-3.5 w-3.5 text-white stroke-[3] absolute inset-0 m-auto" />}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -460,10 +491,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 }).map((sub) => {
                   const isSelected = subbase === sub.id;
                   return (
-                    <button
+                    <motion.button
                       key={sub.id}
                       onClick={() => setSubbase(sub.id)}
                       id={`subbase-opt-${sub.id}`}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer ${
                         isSelected
                           ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
@@ -480,7 +514,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                       <div className="pt-2 border-t border-stone-100 mt-auto flex justify-end items-center text-[10px] text-stone-400 font-mono">
                         <span className="text-brand-sage font-bold">{sub.durability.split(' - ')[0]}</span>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -501,10 +535,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 }).map((feature) => {
                   const isChecked = selectedSmartFeatures.includes(feature.id);
                   return (
-                    <div
+                    <motion.div
                       key={feature.id}
                       onClick={() => toggleSmartFeature(feature.id)}
                       id={`smart-opt-${feature.id}`}
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       className={`p-4 rounded-2xl border flex gap-3 transition cursor-pointer select-none ${
                         isChecked
                           ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
@@ -518,12 +555,35 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                         className="h-4 w-4 mt-0.5 rounded accent-brand-sage pointer-events-none"
                       />
                       <div>
-                        <div className="flex justify-between items-center gap-1.5 mb-1">
-                          <span className="font-bold text-xs sm:text-sm text-brand-stone">{feature.name}</span>
+                        <div className="flex justify-between items-start gap-2 mb-1 relative">
+                          <span className="font-bold text-xs sm:text-sm text-brand-stone pr-6">{feature.name}</span>
+                          <div
+                            className="absolute top-0 right-0 p-1"
+                            onMouseEnter={() => setActiveTooltip(feature.id)}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                          >
+                            <Info className="h-3.5 w-3.5 text-stone-400 hover:text-brand-sage transition-colors" />
+                            <AnimatePresence>
+                              {activeTooltip === feature.id && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                                  transition={{ duration: 0.15 }}
+                                  className="absolute bottom-full mb-2 right-0 w-48 p-2.5 bg-[#0E0E0E] text-white text-[10px] rounded-lg shadow-xl z-50 pointer-events-none font-sans border border-white/10"
+                                >
+                                  <div className="font-bold text-brand-sage mb-1 uppercase tracking-wider">{feature.category} Upgrade</div>
+                                  <div className="leading-relaxed text-stone-300">{getFeatureBenefit(feature.category)}</div>
+                                  {/* Triangle arrow */}
+                                  <div className="absolute top-full right-1.5 -mt-1 w-2 h-2 bg-[#0E0E0E] border-r border-b border-white/10 rotate-45" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
                         </div>
                         <span className="text-[11px] text-stone-500 leading-normal block">{feature.description}</span>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
