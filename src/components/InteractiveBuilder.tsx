@@ -19,7 +19,7 @@ import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES, SMART_FEATURES, COLORS } f
 import { CourtVisualizer } from './CourtVisualizer';
 import { CostEstimator } from './CostEstimator';
 import { TimelineTracker } from './TimelineTracker';
-import { Dribbble, Activity, Zap, Play, Flame, Check, Info, Hammer, Settings, ArrowDown, Dumbbell, Target, Trophy, Waves, Layout, Volleyball } from 'lucide-react';
+import { Dribbble, Activity, Zap, Play, Flame, Check, Info, Hammer, Settings, ArrowDown, Dumbbell, Target, Trophy, Waves, Layout, Volleyball, Eye } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 
 interface InteractiveBuilderProps {
@@ -44,6 +44,10 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
   const [selectedSmartFeatures, setSelectedSmartFeatures] = useState<string[]>(config.selectedSmartFeatures);
   const [visualizePlayers, setVisualizePlayers] = useState<boolean>(config.visualizePlayers !== false);
   const [animatePlayers, setAnimatePlayers] = useState<boolean>(config.animatePlayers !== false);
+  const [poolDepth, setPoolDepth] = useState<number>(config.poolDepth || 6);
+  const [visualPoolDepth, setVisualPoolDepth] = useState<number>(config.poolDepth || 6);
+  const [glassPool, setGlassPool] = useState<boolean>(config.glassPool !== false);
+  const [crystalClearWater, setCrystalClearWater] = useState<boolean>(config.crystalClearWater || false);
 
   // Debounce visual input changes to heavy canvas/price state updates (100ms)
   useEffect(() => {
@@ -59,6 +63,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
     }, 80);
     return () => clearTimeout(timer);
   }, [visualWidth, width]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualPoolDepth !== poolDepth) setPoolDepth(visualPoolDepth);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualPoolDepth, poolDepth]);
 
   // Sync state from parent's config prop (e.g. from Hero Showcase clicks or initialization)
   useEffect(() => {
@@ -78,6 +89,12 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
     if (config.subbase !== subbase) setSubbase(config.subbase);
     if (config.visualizePlayers !== undefined && config.visualizePlayers !== visualizePlayers) setVisualizePlayers(config.visualizePlayers);
     if (config.animatePlayers !== undefined && config.animatePlayers !== animatePlayers) setAnimatePlayers(config.animatePlayers);
+    if (config.poolDepth !== undefined && config.poolDepth !== poolDepth) {
+      setPoolDepth(config.poolDepth);
+      setVisualPoolDepth(config.poolDepth);
+    }
+    if (config.glassPool !== undefined && config.glassPool !== glassPool) setGlassPool(config.glassPool);
+    if (config.crystalClearWater !== undefined && config.crystalClearWater !== crystalClearWater) setCrystalClearWater(config.crystalClearWater);
     
     // Check if arrays match
     const equalArr = config.selectedSmartFeatures.length === selectedSmartFeatures.length &&
@@ -146,12 +163,15 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
     subbase,
     selectedSmartFeatures,
     visualizePlayers,
-    animatePlayers
+    animatePlayers,
+    poolDepth,
+    glassPool,
+    crystalClearWater
   };
 
   useEffect(() => {
     onConfigChange(activeConfig);
-  }, [sportType, length, width, surfaceMaterial, primaryColor, secondaryColor, lineColor, subbase, selectedSmartFeatures, visualizePlayers, animatePlayers]);
+  }, [sportType, length, width, surfaceMaterial, primaryColor, secondaryColor, lineColor, subbase, selectedSmartFeatures, visualizePlayers, animatePlayers, poolDepth, glassPool, crystalClearWater]);
 
   // Accessories toggle
   const toggleSmartFeature = (id: string) => {
@@ -300,6 +320,30 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   </div>
                 </div>
 
+                {/* Pool Depth Selector if Swimming Pool */}
+                {sportType === 'SWIMMING_POOL' && (
+                  <div className="pt-4 border-t border-stone-100">
+                    <div className="flex justify-between text-xs font-mono text-stone-550 mb-2">
+                      <span className="font-bold flex items-center gap-1.5 text-brand-stone">Pool Custom Depth</span>
+                      <span className="text-brand-sage font-bold bg-brand-sage-soft px-2.5 py-0.5 rounded-full text-[10px]">{visualPoolDepth} ft</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={4}
+                      max={12}
+                      step={1}
+                      value={visualPoolDepth}
+                      onChange={(e) => setVisualPoolDepth(parseInt(e.target.value, 10))}
+                      className="w-full h-1.5 rounded-lg appearance-none cursor-ew-resize bg-stone-200 accent-brand-sage"
+                    />
+                    <div className="flex justify-between text-[9px] font-mono text-stone-400 mt-1">
+                      <span>Shallow / Kids (4 ft)</span>
+                      <span>Olympic Swim (6-8 ft)</span>
+                      <span>Deep Diving (12 ft)</span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Size Presets buttons */}
                 <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-100">
                   <span className="text-[10px] text-stone-500 uppercase font-bold tracking-wider my-auto mr-1">Ratios:</span>
@@ -362,31 +406,74 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                   const isSelected = surfaceMaterial === material.id;
 
                   return (
-                    <motion.button
-                      key={material.id}
-                      onClick={() => setSurfaceMaterial(material.id)}
-                      id={`surface-opt-${material.id}`}
-                      whileHover={{ scale: 1.02, x: 4 }}
-                      whileTap={{ scale: 0.99 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className={`flex flex-col sm:flex-row justify-between text-left p-4 rounded-2xl border transition w-full ${
-                        isSelected
-                          ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
-                          : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone cursor-pointer'
-                      }`}
+                    <div 
+                      key={material.id} 
+                      className="relative w-full"
+                      onMouseEnter={() => setActiveTooltip(`surface-${material.id}`)}
+                      onMouseLeave={() => setActiveTooltip(null)}
+                      onFocus={() => setActiveTooltip(`surface-${material.id}`)}
+                      onBlur={() => setActiveTooltip(null)}
                     >
-                      <div className="mb-2 sm:mb-0 w-full">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-bold text-sm text-brand-stone">{material.name}</span>
-                          <span className={`px-2 py-0.5 rounded text-[8px] tracking-wider uppercase font-extrabold ${
-                            material.category === 'Indoor' 
-                              ? 'bg-amber-150 text-amber-800 font-mono border border-amber-200' 
-                              : 'bg-stone-200 text-stone-700 font-mono border border-stone-250'
-                          }`}>{material.category}</span>
+                      <motion.button
+                        id={`surface-opt-${material.id}`}
+                        onClick={() => setSurfaceMaterial(material.id)}
+                        whileHover={{ scale: 1.02, x: 4 }}
+                        whileTap={{ scale: 0.99 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className={`flex flex-col sm:flex-row justify-between text-left p-4 rounded-2xl border transition w-full ${
+                          isSelected
+                            ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
+                            : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone cursor-pointer'
+                        }`}
+                      >
+                        <div className="mb-2 sm:mb-0 w-full">
+                          <div className="flex items-start justify-between gap-2 mb-1 w-full relative">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-sm text-brand-stone">{material.name}</span>
+                              <span className={`px-2 py-0.5 rounded text-[8px] tracking-wider uppercase font-extrabold ${
+                                material.category === 'Indoor' 
+                                  ? 'bg-amber-150 text-amber-800 font-mono border border-amber-200' 
+                                  : 'bg-stone-200 text-stone-700 font-mono border border-stone-250'
+                              }`}>{material.category}</span>
+                            </div>
+                            <Info className="w-4 h-4 text-stone-400 hover:text-brand-sage transition-colors shrink-0" />
+                          </div>
+                          <span className="text-xs text-stone-500 leading-snug block pr-8">{material.description}</span>
                         </div>
-                        <span className="text-xs text-stone-500 leading-snug block">{material.description}</span>
-                      </div>
-                    </motion.button>
+                      </motion.button>
+                      
+                      <AnimatePresence>
+                        {activeTooltip === `surface-${material.id}` && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute z-[60] bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 bg-[#0E0E0E] border border-white/10 text-stone-200 text-xs rounded-xl shadow-2xl p-4 pointer-events-none text-left"
+                          >
+                            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0E0E0E] border-b border-r border-white/10 rotate-45 transform" />
+                            <div className="font-bold text-white mb-2 flex items-center gap-1.5">
+                              <Info className="w-4 h-4 text-brand-sage" />
+                              Material Benefits
+                            </div>
+                            <div className="space-y-1.5 text-[11px] leading-relaxed">
+                              <div><span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-0.5">Thickness</span> {material.thickness}</div>
+                              <div><span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-0.5">Warranty</span> {material.warranty}</div>
+                              {material.features && material.features.length > 0 && (
+                                <div className="mt-2 pt-2 border-t border-white/10">
+                                  <span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-1">Key advantages</span>
+                                  <ul className="list-disc pl-3 space-y-1 text-stone-300">
+                                    {material.features.slice(0, 3).map((feat: string, i: number) => (
+                                      <li key={i}>{feat}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   );
                 })}
               </div>
@@ -395,13 +482,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-stone-100 pt-5">
                 {/* Primary Inner Court */}
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">A. Inner Play Zone Color</span>
+                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">A. Inner Play Zone Color (Deselect to reset)</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
                       <motion.button
                         key={c.value}
                         title={c.name}
-                        onClick={() => setPrimaryColor(c.value)}
+                        onClick={() => setPrimaryColor(primaryColor === c.value ? 'white' : c.value)}
                         whileHover={{ scale: 1.25, zIndex: 10 }}
                         whileTap={{ scale: 0.85 }}
                         transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -418,13 +505,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
 
                 {/* Secondary Outer Border */}
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">B. Runout Margin Color</span>
+                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">B. Runout Margin Color (Deselect to reset)</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
                       <motion.button
                         key={c.value}
                         title={c.name}
-                        onClick={() => setSecondaryColor(c.value)}
+                        onClick={() => setSecondaryColor(secondaryColor === c.value ? 'white' : c.value)}
                         whileHover={{ scale: 1.25, zIndex: 10 }}
                         whileTap={{ scale: 0.85 }}
                         transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -441,13 +528,13 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
 
                 {/* Line Marking Color */}
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">C. Line Marking Color</span>
+                  <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wide block mb-2">C. Line Marking Color (Deselect to reset)</span>
                   <div className="flex flex-wrap gap-1.5">
                     {COLORS.map((c) => (
                       <motion.button
                         key={c.value}
                         title={c.name}
-                        onClick={() => setLineColor(c.value)}
+                        onClick={() => setLineColor(lineColor === c.value ? 'white' : c.value)}
                         whileHover={{ scale: 1.25, zIndex: 10 }}
                         whileTap={{ scale: 0.85 }}
                         transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -554,34 +641,38 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                         onChange={() => {}} // toggled by parent div click
                         className="h-4 w-4 mt-0.5 rounded accent-brand-sage pointer-events-none"
                       />
-                      <div>
-                        <div className="flex justify-between items-start gap-2 mb-1 relative">
+                      <div className="w-full relative">
+                        <div className="flex justify-between items-start gap-2 mb-1 w-full relative">
                           <span className="font-bold text-xs sm:text-sm text-brand-stone pr-6">{feature.name}</span>
                           <div
                             className="absolute top-0 right-0 p-1"
                             onMouseEnter={() => setActiveTooltip(feature.id)}
                             onMouseLeave={() => setActiveTooltip(null)}
+                            onFocus={() => setActiveTooltip(feature.id)}
+                            onBlur={() => setActiveTooltip(null)}
                           >
-                            <Info className="h-3.5 w-3.5 text-stone-400 hover:text-brand-sage transition-colors" />
+                            <Info className="h-4 w-4 text-stone-400 hover:text-brand-sage transition-colors" />
                             <AnimatePresence>
                               {activeTooltip === feature.id && (
                                 <motion.div
-                                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                  initial={{ opacity: 0, y: 5, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 5, scale: 0.95 }}
                                   transition={{ duration: 0.15 }}
-                                  className="absolute bottom-full mb-2 right-0 w-48 p-2.5 bg-[#0E0E0E] text-white text-[10px] rounded-lg shadow-xl z-50 pointer-events-none font-sans border border-white/10"
+                                  className="absolute z-[60] bottom-full mb-2 right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 w-56 p-4 bg-[#0E0E0E] text-stone-200 text-xs rounded-xl shadow-2xl pointer-events-none font-sans border border-white/10 text-left"
                                 >
-                                  <div className="font-bold text-brand-sage mb-1 uppercase tracking-wider">{feature.category} Upgrade</div>
-                                  <div className="leading-relaxed text-stone-300">{getFeatureBenefit(feature.category)}</div>
-                                  {/* Triangle arrow */}
-                                  <div className="absolute top-full right-1.5 -mt-1 w-2 h-2 bg-[#0E0E0E] border-r border-b border-white/10 rotate-45" />
+                                  <div className="absolute -bottom-1.5 right-3 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 w-3 h-3 bg-[#0E0E0E] border-b border-r border-white/10 rotate-45 transform" />
+                                  <div className="font-bold text-white mb-2 flex items-center gap-1.5">
+                                    <Info className="w-4 h-4 text-brand-sage" />
+                                    {feature.category} Upgrade
+                                  </div>
+                                  <div className="leading-relaxed text-[11px] text-stone-300 border-t border-white/10 pt-2">{getFeatureBenefit(feature.category)}</div>
                                 </motion.div>
                               )}
                             </AnimatePresence>
                           </div>
                         </div>
-                        <span className="text-[11px] text-stone-500 leading-normal block">{feature.description}</span>
+                        <span className="text-[11px] text-stone-500 leading-normal block pr-4">{feature.description}</span>
                       </div>
                     </motion.div>
                   );
@@ -651,6 +742,54 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                     />
                   </button>
                 </div>
+
+                {sportType === 'SWIMMING_POOL' && (
+                  <>
+                    <div className="flex items-center justify-between gap-4 pt-3 border-t border-stone-100">
+                      <div>
+                        <span className="text-xs font-bold text-brand-stone block text-brand-sage font-sans flex items-center gap-1.5">
+                          <Waves className="h-3.5 w-3.5 animate-pulse" />
+                          X-Ray Glass Basin Mode
+                        </span>
+                        <span className="text-[10px] text-stone-500 block">Make pool walls transparent to view underwater equipment & layout depth details.</span>
+                      </div>
+                      <button
+                        onClick={() => setGlassPool(!glassPool)}
+                        className={`relative inline-flex h-6.5 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                          glassPool ? 'bg-brand-sage' : 'bg-stone-200'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out ${
+                            glassPool ? 'translate-x-4.5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 pt-3 border-t border-stone-100">
+                      <div>
+                        <span className="text-xs font-bold text-brand-stone block text-brand-sage font-sans flex items-center gap-1.5">
+                          <Eye className="h-3.5 w-3.5" />
+                          See-Through Water Mode
+                        </span>
+                        <span className="text-[10px] text-stone-500 block">Make water transparent to look underneath the surface & scan add-ons perfectly.</span>
+                      </div>
+                      <button
+                        onClick={() => setCrystalClearWater(!crystalClearWater)}
+                        className={`relative inline-flex h-6.5 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                          crystalClearWater ? 'bg-brand-sage' : 'bg-stone-200'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out ${
+                            crystalClearWater ? 'translate-x-4.5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

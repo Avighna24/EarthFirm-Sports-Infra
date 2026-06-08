@@ -82,6 +82,8 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
   const [width, setWidth] = useState<number>(50);
   const [visualLength, setVisualLength] = useState<number>(94);
   const [visualWidth, setVisualWidth] = useState<number>(50);
+  const [poolDepth, setPoolDepth] = useState<number>(6);
+  const [visualPoolDepth, setVisualPoolDepth] = useState<number>(6);
   const [surfaceMaterial, setSurfaceMaterial] = useState<SurfaceMaterialType>('CANADIAN_MAPLE');
   const [subbase, setSubbase] = useState<SubbaseType>('POST_TENSION_CONCRETE');
   const [budgetTier, setBudgetTier] = useState<'Standard' | 'Premium' | 'Luxury Elite'>('Premium');
@@ -111,6 +113,13 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
     }, 80);
     return () => clearTimeout(timer);
   }, [visualWidth, width]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visualPoolDepth !== poolDepth) setPoolDepth(visualPoolDepth);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [visualPoolDepth, poolDepth]);
 
   // Handle sport preset changes to update default dimensions
   const handleSportSelect = (sport: SportType) => {
@@ -153,15 +162,16 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
 
   // Precalculated metrics
   const areaSqFt = length * width;
+  const poolDepthMultiplier = sportType === 'SWIMMING_POOL' ? Math.max(1, poolDepth / 6.0) : 1.0;
   const sportPreset = sportType ? SPORT_PRESETS[sportType] : SPORT_PRESETS['BASKETBALL'];
   const materialPreset = SURFACE_MATERIALS[surfaceMaterial];
   const subbasePreset = SUB_BASES[subbase];
 
   // Dynamically calculate interactive sports infrastructure budget
-  const baseCost = areaSqFt * (sportPreset?.basePricePerSqFt || 300);
-  const surfaceCost = areaSqFt * (materialPreset?.costPerSqFt || 600);
-  const subbaseCost = areaSqFt * (subbasePreset?.costPerSqFt || 500);
-  const engineeringSetup = 45000 + areaSqFt * 1.5;
+  const baseCost = areaSqFt * (sportPreset?.basePricePerSqFt || 300) * poolDepthMultiplier;
+  const surfaceCost = areaSqFt * (materialPreset?.costPerSqFt || 600) * (sportType === 'SWIMMING_POOL' ? Math.max(1, (poolDepth / 6.0) * 0.7) : 1.0);
+  const subbaseCost = areaSqFt * (subbasePreset?.costPerSqFt || 500) * poolDepthMultiplier;
+  const engineeringSetup = 45000 + areaSqFt * 1.5 * poolDepthMultiplier;
   const transportationDispatch = 25000 + (location ? 15000 : 0);
   const markingCivilWork = 12500 + areaSqFt * 0.9;
   
@@ -481,13 +491,43 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                           className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-col-resize"
                         />
                       </div>
+
+                      {/* Pool Depth Slider */}
+                      {sportType === 'SWIMMING_POOL' && (
+                        <div className="space-y-1 pt-2">
+                          <div className="flex justify-between items-center text-[10px] font-mono text-neutral-400">
+                            <span>DEPTH: <strong className="text-emerald-400 text-xs">{visualPoolDepth} Feet</strong> ({Math.round(visualPoolDepth * 0.3048 * 10) / 10} m)</span>
+                            <span>Range: 4&apos; - 12&apos;</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={4}
+                            max={12}
+                            step={1}
+                            value={visualPoolDepth}
+                            onChange={(e) => setVisualPoolDepth(Number(e.target.value))}
+                            className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-col-resize"
+                          />
+                          <div className="flex justify-between text-[9px] font-mono text-stone-500 mt-1 uppercase">
+                            <span>Kids (4 ft)</span>
+                            <span>Olympic (6-8 ft)</span>
+                            <span>Dive (12 ft)</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Live Area Snapshot */}
                     <div className="pt-2 flex justify-between items-center text-xs text-neutral-400">
-                      <span>Computed Area:</span>
+                      <span>Computed {sportType === 'SWIMMING_POOL' ? 'Surface Area' : 'Area'}:</span>
                       <span className="font-mono text-emerald-400 text-base font-bold">{(visualLength * visualWidth).toLocaleString()} Sq. Ft</span>
                     </div>
+                    {sportType === 'SWIMMING_POOL' && (
+                      <div className="flex justify-between items-center text-xs text-neutral-400">
+                        <span>Computed Volume:</span>
+                        <span className="font-mono text-emerald-400 text-base font-bold">{(visualLength * visualWidth * visualPoolDepth).toLocaleString()} Cu. Ft</span>
+                      </div>
+                    )}
 
                   </div>
 
@@ -503,7 +543,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E0E] via-transparent to-transparent z-1" />
                         <span className="absolute bottom-3 left-3 bg-emerald-500 text-white font-mono text-[9px] px-2.5 py-1 tracking-wider uppercase font-bold rounded-lg z-2">
-                          {(visualLength * visualWidth).toLocaleString()} SQ. FT
+                          {(visualLength * visualWidth).toLocaleString()} SQ. FT {sportType === 'SWIMMING_POOL' && `/ ${(visualLength * visualWidth * visualPoolDepth).toLocaleString()} CU. FT`}
                         </span>
                       </div>
                       <div className="p-5 flex-grow flex flex-col justify-between space-y-4 bg-[#0E0E0E]/90">

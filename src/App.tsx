@@ -94,13 +94,15 @@ export default function App() {
       length: 94,
       width: 50,
       surfaceMaterial: 'CANADIAN_MAPLE',
-      primaryColor: 'blue',
-      secondaryColor: 'gray',
+      primaryColor: 'white',
+      secondaryColor: 'white',
       lineColor: '#ffffff',
       subbase: 'POST_TENSION_CONCRETE',
       selectedSmartFeatures: ['PERIPHERAL_FENCING', 'SMART_FLOODLIGHTS'],
       visualizePlayers: true,
-      animatePlayers: true
+      animatePlayers: true,
+      glassPool: true,
+      crystalClearWater: false
     };
   });
 

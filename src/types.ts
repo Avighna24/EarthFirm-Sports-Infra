@@ -69,6 +69,9 @@ export interface CourtConfiguration {
   selectedSmartFeatures: string[];
   visualizePlayers?: boolean;
   animatePlayers?: boolean;
+  poolDepth?: number;
+  glassPool?: boolean;
+  crystalClearWater?: boolean;
 }
 
 export interface EstimatorSummary {
