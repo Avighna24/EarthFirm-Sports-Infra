@@ -15,7 +15,7 @@ import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
 import { FloatingActions } from './components/FloatingActions';
 import { CourtConfiguration } from './types';
-import { Landmark, Trophy, ShieldCheck, Zap, Info, ArrowUp, Sparkles, MapPin, Mail, Phone, Clock, Globe, Building } from 'lucide-react';
+import { Landmark, Trophy, ShieldCheck, Zap, Info, ArrowUp, Sparkles, MapPin, Mail, Phone, Clock, Globe, Building, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
 const staggerContainer = {
@@ -192,10 +192,10 @@ export default function App() {
 
       {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
       <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <InteractiveBuilder
           config={activeConfig}
@@ -206,19 +206,19 @@ export default function App() {
 
       {/* 3. MATERIAL PORTFOLIO TAB LAB & CROSS SECTION EXPLODER */}
       <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <ProductCatalog />
       </motion.div>
 
       <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <ContactUs />
       </motion.div>
@@ -257,12 +257,43 @@ export default function App() {
               </div>
             </div>
 
-            {/* Hours */}
+            {/* Hours and Socials */}
             <div>
               <h5 className="font-bold font-mono uppercase text-white mb-3 tracking-widest text-[11px]">Operational Hours</h5>
-              <div className="space-y-1.5 text-brand-cream/70 text-xs">
+              <div className="space-y-1.5 text-brand-cream/70 text-xs mb-6">
                 <p>Monday &ndash; Saturday: 08:00 AM &ndash; 08:00 PM</p>
                 <p>Sunday: Closed (Dispatch Available Only)</p>
+              </div>
+
+              <h5 className="font-bold font-mono uppercase text-white mb-3 tracking-widest text-[11px]">Follow Us</h5>
+              <div className="flex gap-4">
+                <a 
+                  href="https://www.instagram.com/earthfirm_sportsinfra/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800/80 text-[#E1306C] hover:text-white hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-[#ee2a7b]/20"
+                >
+                  <Instagram className="h-5 w-5" />
+                  <span className="sr-only">Instagram</span>
+                </a>
+                <a 
+                  href="https://facebook.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800/80 text-[#1877F2] hover:text-white hover:bg-[#1877F2] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-[#1877F2]/20"
+                >
+                  <Facebook className="h-5 w-5" />
+                  <span className="sr-only">Facebook</span>
+                </a>
+                <a 
+                  href="https://linkedin.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800/80 text-[#0077B5] hover:text-white hover:bg-[#0077B5] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-[#0077B5]/20"
+                >
+                  <Linkedin className="h-5 w-5" />
+                  <span className="sr-only">LinkedIn</span>
+                </a>
               </div>
             </div>
 

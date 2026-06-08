@@ -25,7 +25,7 @@ const steps = [
       "Football Turf",
       "Track & Running Fields",
       "Multi-Purpose Gym",
-      "Box Cricket",
+      "Cricket Turf",
       "Badminton Court",
       "Swimming Pool",
       "Squash Court",

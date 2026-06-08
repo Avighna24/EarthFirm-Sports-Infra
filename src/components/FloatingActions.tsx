@@ -107,7 +107,7 @@ export function FloatingActions({ onScrollToContact }: FloatingActionsProps) {
     { value: 'FOOTBALL', label: 'Football Turf' },
     { value: 'TRACK_FIELD', label: 'Track & Running Fields' },
     { value: 'GYM', label: 'Multi-Purpose Gym' },
-    { value: 'CRICKET', label: 'Box Cricket' },
+    { value: 'CRICKET', label: 'Cricket Turf' },
     { value: 'BADMINTON', label: 'Badminton Court' },
     { value: 'SWIMMING_POOL', label: 'Swimming Pool' },
     { value: 'SQUASH', label: 'Squash Court' },

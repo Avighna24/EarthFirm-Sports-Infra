@@ -58,6 +58,8 @@ export function getPlayersForSport(
     list.push({ id: `cri-field-1`, team: 'A', role: `fielder_1`, color: teamAColor });
     list.push({ id: `cri-field-2`, team: 'A', role: `fielder_2`, color: teamAColor });
     list.push({ id: `cri-field-3`, team: 'A', role: `fielder_3`, color: teamAColor });
+    list.push({ id: `cri-field-4`, team: 'A', role: `fielder_4`, color: teamAColor });
+    list.push({ id: `cri-field-5`, team: 'A', role: `fielder_5`, color: teamAColor });
   } else if (sportType === 'SWIMMING_POOL') {
     list.push({ id: `sw-1`, team: 'neutral', role: `swimmer_0`, color: '#38bdf8' });
     list.push({ id: `sw-2`, team: 'neutral', role: `swimmer_1`, color: '#ec4899' });
@@ -897,6 +899,12 @@ export function getDeterministicMatchState(
             }
           } else if (playerRole === 'fielder_2') {
             playerX = -courtW * 0.35; playerZ = 0; playerPose = 'standing';
+          } else if (playerRole === 'fielder_3') {
+            playerX = courtW * 0.35; playerZ = 0; playerPose = 'standing';
+          } else if (playerRole === 'fielder_4') {
+            playerX = -courtW * 0.25; playerZ = courtL * 0.35; playerPose = 'standing';
+          } else if (playerRole === 'fielder_5') {
+            playerX = 0; playerZ = courtL * 0.45; playerPose = 'standing';
           } else {
             playerX = -0.4; playerZ = -courtL*0.1; playerPose = 'standing';
           }
@@ -2135,28 +2143,23 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
 
       {sportType === 'CRICKET' && (
         <group>
-           {/* Circular Outfield Representation for realism */}
-           <Cylinder args={[Math.max(courtW, courtL)*0.7, Math.max(courtW, courtL)*0.7, 0.08]} position={[0, -0.01, 0]} receiveShadow>
-             <meshStandardMaterial color="#4ade80" roughness={1.0} />
-           </Cylinder>
-           
            {/* Cricket pitch - artificial turf / clay runway */}
-           <Box args={[courtW * 0.15, 0.03, courtL * 0.6]} position={[0, 0.02, 0]} receiveShadow>
+           <Box args={[courtW * 0.25, 0.03, courtL * 0.6]} position={[0, 0.02, 0]} receiveShadow>
              <meshStandardMaterial color="#b45309" roughness={0.9} />
            </Box>
            
            {/* Crease lines */}
-           <Box args={[courtW * 0.15, 0.01, 0.04]} position={[0, 0.04, courtL * 0.25]}>
+           <Box args={[courtW * 0.25, 0.01, 0.04]} position={[0, 0.04, courtL * 0.25]}>
              <meshStandardMaterial color={lineStroke} />
            </Box>
-           <Box args={[courtW * 0.15, 0.01, 0.04]} position={[0, 0.04, -courtL * 0.25]}>
+           <Box args={[courtW * 0.25, 0.01, 0.04]} position={[0, 0.04, -courtL * 0.25]}>
              <meshStandardMaterial color={lineStroke} />
            </Box>
            
-           <Box args={[courtW * 0.18, 0.01, 0.04]} position={[0, 0.04, courtL * 0.28]}>
+           <Box args={[courtW * 0.28, 0.01, 0.04]} position={[0, 0.04, courtL * 0.28]}>
              <meshStandardMaterial color={lineStroke} />
            </Box>
-           <Box args={[courtW * 0.18, 0.01, 0.04]} position={[0, 0.04, -courtL * 0.28]}>
+           <Box args={[courtW * 0.28, 0.01, 0.04]} position={[0, 0.04, -courtL * 0.28]}>
              <meshStandardMaterial color={lineStroke} />
            </Box>
 
@@ -2179,9 +2182,9 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
              </group>
            ))}
            
-           {/* Optional Practice Netting Cage */}
-           <Box args={[courtW * 0.35, 2.5, courtL * 0.65]} position={[0, 1.25, 0]}>
-             <meshStandardMaterial color="#374151" transparent opacity={0.15} wireframe />
+           {/* Box Cricket Full Turf Netting Cage */}
+           <Box args={[courtW, 3.5, courtL]} position={[0, 1.75, 0]}>
+             <meshStandardMaterial color="#374151" transparent opacity={0.25} wireframe />
            </Box>
             <SimulatedBall sportType="CRICKET" courtL={courtL} courtW={courtW} animate={animatePlayers} visible={visualizePlayers} />
         </group>

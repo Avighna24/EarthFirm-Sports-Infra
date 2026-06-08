@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Clock, Globe } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Globe, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const staggerItem = {
@@ -145,14 +145,50 @@ export function ContactUs() {
                   </a>
                 </div>
 
-                {/* Hours */}
-                <div className="space-y-2">
-                  <span className="text-[10px] font-mono text-neutral-500 font-bold uppercase tracking-wider block">Operational Timetable</span>
-                  <div className="flex gap-2">
-                    <Clock className="h-4 w-4 text-brand-sage shrink-0 mt-0.5" />
-                    <div className="space-y-1 text-neutral-300 font-medium">
-                      <p className="flex justify-between gap-4"><span>Mon &ndash; Sat:</span> <span className="font-mono text-[11px] font-bold">08:00 AM &ndash; 08:00 PM</span></p>
-                      <p className="flex justify-between gap-4"><span>Sunday:</span> <span className="text-red-400 font-bold">Closed (Dispatch Only)</span></p>
+                {/* Hours & Socials */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-mono text-neutral-500 font-bold uppercase tracking-wider block">Operational Timetable</span>
+                    <div className="flex gap-2">
+                      <Clock className="h-4 w-4 text-brand-sage shrink-0 mt-0.5" />
+                      <div className="space-y-1 text-neutral-300 font-medium">
+                        <p className="flex justify-between gap-4"><span>Mon &ndash; Sat:</span> <span className="font-mono text-[11px] font-bold">08:00 AM &ndash; 08:00 PM</span></p>
+                        <p className="flex justify-between gap-4"><span>Sunday:</span> <span className="text-red-400 font-bold">Closed (Dispatch Only)</span></p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Socials */}
+                  <div className="space-y-3 pt-2 border-t border-white/5">
+                    <span className="text-[10px] font-mono text-neutral-500 font-bold uppercase tracking-wider block">Follow Us</span>
+                    <div className="flex gap-4">
+                      <a 
+                        href="https://www.instagram.com/earthfirm_sportsinfra/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center justify-center p-2.5 rounded-lg bg-neutral-900 border border-neutral-800/80 text-[#E1306C] hover:text-white hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-md hover:shadow-[#ee2a7b]/20"
+                      >
+                        <Instagram className="h-4 w-4" />
+                        <span className="sr-only">Instagram</span>
+                      </a>
+                      <a 
+                        href="https://facebook.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center justify-center p-2.5 rounded-lg bg-neutral-900 border border-neutral-800/80 text-[#1877F2] hover:text-white hover:bg-[#1877F2] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-md hover:shadow-[#1877F2]/20"
+                      >
+                        <Facebook className="h-4 w-4" />
+                        <span className="sr-only">Facebook</span>
+                      </a>
+                      <a 
+                        href="https://linkedin.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center justify-center p-2.5 rounded-lg bg-neutral-900 border border-neutral-800/80 text-[#0077B5] hover:text-white hover:bg-[#0077B5] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-md hover:shadow-[#0077B5]/20"
+                      >
+                        <Linkedin className="h-4 w-4" />
+                        <span className="sr-only">LinkedIn</span>
+                      </a>
                     </div>
                   </div>
                 </div>
