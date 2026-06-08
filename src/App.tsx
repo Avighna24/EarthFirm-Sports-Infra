@@ -286,7 +286,7 @@ export default function App() {
                   <span className="sr-only">Facebook</span>
                 </a>
                 <a 
-                  href="https://linkedin.com" 
+                  href="https://www.linkedin.com/in/earthfirm-sports-infra-4b3b70413?utm_source=share_via&utm_content=profile&utm_medium=member_android" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800/80 text-[#0077B5] hover:text-white hover:bg-[#0077B5] hover:border-transparent transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-[#0077B5]/20"
