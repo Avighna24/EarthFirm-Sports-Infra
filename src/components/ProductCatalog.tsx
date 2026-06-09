@@ -5,7 +5,9 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { SURFACE_MATERIALS } from '../constants';
+import { SURFACE_MATERIALS, COLORS } from '../constants';
+import { SurfaceMaterialType } from '../types';
+import { Layers, Shield, Award, Calendar, HelpCircle, HardHat, Sparkles } from 'lucide-react';
 
 const staggerItem = {
   hidden: { opacity: 0, y: 25 },
@@ -15,12 +17,11 @@ const staggerItem = {
     transition: { duration: 0.6, ease: 'easeOut' }
   }
 } as const;
-import { SurfaceMaterialType } from '../types';
-import { Layers, Shield, Award, Calendar, HelpCircle, HardHat, Sparkles } from 'lucide-react';
 
 export const ProductCatalog: React.FC = () => {
   const [activeMaterialId, setActiveMaterialId] = useState<SurfaceMaterialType>('CANADIAN_MAPLE');
   const [hoveredLayerIndex, setHoveredLayerIndex] = useState<number | null>(null);
+  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
 
   const material = SURFACE_MATERIALS[activeMaterialId];
 
@@ -166,7 +167,28 @@ export const ProductCatalog: React.FC = () => {
               )}
             </div>
 
+            {/* Color Swatches Grid */}
+            <div className="mt-8 pt-8 border-t border-stone-200">
+              <h4 className="text-sm font-bold font-mono text-brand-stone mb-4">Available Finishes / Colors</h4>
+              <div className="flex flex-wrap gap-3">
+                {COLORS.map((color) => (
+                  <button
+                    key={color.hex}
+                    onClick={() => setSelectedColor(color)}
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110 ${
+                      selectedColor.hex === color.hex ? 'border-brand-sage scale-110 ring-2 ring-brand-sage ring-offset-2' : 'border-stone-300'
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-stone-500 mt-4">Selected Finish: <strong className="text-brand-stone">{selectedColor.name}</strong></p>
+            </div>
+
           </motion.div>
+
+          {/* RIGHT COLUMN: INTERACTIVE LAYER EXPLODER GRID (col-span-7) */}
 
         </div>
 

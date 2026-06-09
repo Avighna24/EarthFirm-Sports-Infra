@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES } from '../constants';
 import { SportType, SurfaceMaterialType, SubbaseType } from '../types';
-import { saveDocument } from '../firebase';
+import { saveDocument } from './firebase';
 
 // Import high-fidelity visual assets generated according to user specification
 import squashCourtImg from '../assets/images/squash_court_1780661148365.png';
@@ -145,7 +145,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
         setSurfaceMaterial('CANADIAN_MAPLE');
         setSubbase('SQUASH_DOUBLE_BATTEN');
       } else if (sport === 'GYM') {
-        setSurfaceMaterial('CANADIAN_MAPLE');
+        setSurfaceMaterial('GYM_RUBBER');
         setSubbase('GYM_ACOUSTIC_SLAB');
       } else if (sport === 'TENNIS' || sport === 'PICKLEBALL') {
         setSurfaceMaterial('PRO_ACRYLIC');
@@ -352,7 +352,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E0E] via-transparent to-transparent z-1" />
                           <span className="absolute bottom-3 left-3 bg-red-500 text-white font-mono text-[9px] px-2.5 py-1 tracking-wider uppercase font-bold rounded-lg z-2">
-                            EST. ₹{sportPreset.basePricePerSqFt}/sqft
+                              {/* Pricing removed */}
                           </span>
                         </div>
                         <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-[#0E0E0E]/90">
@@ -615,17 +615,16 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                     <h3 className="text-[10px] uppercase tracking-wider font-mono text-zinc-400">01. Upper Elastomer Layer</h3>
                     <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 customize-scrollbar">
                       {Object.keys(SURFACE_MATERIALS).filter((key) => {
-                        if (sportType === 'SWIMMING_POOL') {
-                          return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(key);
-                        } else if (sportType === 'SQUASH') {
-                          return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(key);
-                        } else if (sportType === 'FOOTBALL') {
-                          return ['COMPOSITE_TURF'].includes(key);
-                        } else if (sportType === 'TRACK_FIELD') {
-                          return !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(key);
-                        } else {
-                          return !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(key);
-                        }
+                        const isGym = sportType === 'GYM';
+                        const isGymMaterial = ['GYM_RUBBER', 'GYM_VINYL', 'GYM_FOAM', 'GYM_TURF', 'GYM_CORK'].includes(key);
+
+                        if (isGym) return isGymMaterial;
+                        if (sportType === 'SWIMMING_POOL') return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(key);
+                        if (sportType === 'SQUASH') return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(key);
+                        if (sportType === 'FOOTBALL') return ['COMPOSITE_TURF'].includes(key);
+                        if (sportType === 'CRICKET') return ['COMPOSITE_TURF'].includes(key);
+                        if (sportType === 'TRACK_FIELD') return ['PRO_ACRYLIC', 'PP_TILES', 'COMPOSITE_TURF'].includes(key);
+                        return ['CANADIAN_MAPLE', 'PRO_ACRYLIC', 'PP_TILES'].includes(key);
                       }).map((key) => {
                         const m = SURFACE_MATERIALS[key];
                         const active = surfaceMaterial === key;
@@ -640,7 +639,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                             <div className="pr-2">
                               <span className="font-extrabold text-xs block uppercase">{m.name}</span>
                               <span className={`text-[9px] font-mono uppercase ${active ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                ₹{m.costPerSqFt}/sqft
+                                Material Option
                               </span>
                             </div>
                             {active && <CheckCircle2 className="h-4 w-4 text-black shrink-0" />}
@@ -682,7 +681,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                             <div className="pr-2">
                               <span className="font-extrabold text-xs block uppercase">{b.name}</span>
                               <span className={`text-[9px] font-mono uppercase ${active ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                ₹{b.costPerSqFt}/sqft
+                                Subbase Option
                               </span>
                             </div>
                             {active && <CheckCircle2 className="h-4 w-4 text-black shrink-0" />}
@@ -883,7 +882,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                       <div className="space-y-1.5 text-center sm:text-left">
                         <span className="text-[9px] uppercase font-mono tracking-widest text-zinc-400 block">TOTAL STRUCTURAL CONTRACT ESTIMATE CONTRACT RECKONING</span>
                         <div className="text-2xl sm:text-3xl font-mono font-black text-white print:text-black mt-1">
-                          ₹{minCostRange.toLocaleString('en-IN')} - ₹{maxCostRange.toLocaleString('en-IN')}
+                          Estimate Available on Consultation
                         </div>
                         <span className="text-[8px] text-zinc-500 block leading-tight pt-1">
                           * Based on {areaSqFt.toLocaleString()} sqft layout, Indore manufacturing output freight, and onsite layout adjustments.
@@ -893,15 +892,12 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                       <div className="border-t border-white/5 my-2.5 pt-2.5 space-y-1.5 text-[10px] text-neutral-400 print:border-neutral-300">
                         <div className="flex justify-between">
                           <span>Upper Cushion ({materialPreset.name})</span>
-                          <span className="font-mono text-white print:text-black">₹{surfaceCost.toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Aggregate Core subbase ({subbasePreset.name})</span>
-                          <span className="font-mono text-white print:text-black">₹{subbaseCost.toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Civil Grading Engineering + Shipping dispatch</span>
-                          <span className="font-mono text-white print:text-black">₹{(transportationDispatch + engineeringSetup).toLocaleString('en-IN')}</span>
                         </div>
                       </div>
                     </div>
@@ -987,13 +983,6 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
                         className="px-5 py-3 border border-white/10 text-[10px] text-white bg-neutral-900 uppercase tracking-wider font-bold hover:bg-neutral-850 transition cursor-pointer text-center"
                       >
                         Return to Showcase
-                      </button>
-                      <button
-                        onClick={handlePrint}
-                        className="px-5 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-wider hover:bg-neutral-200 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Print Specs Sheet
                       </button>
                     </div>
                   </div>

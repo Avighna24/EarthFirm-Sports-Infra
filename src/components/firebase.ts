@@ -1,9 +1,9 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, setDoc, serverTimestamp, getDocFromServer } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, serverTimestamp, getDocFromServer, collection, addDoc } from 'firebase/firestore';
 
 // Load local Firebase config
-import firebaseConfig from '../firebase-applet-config.json';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 const isPlaceholder = !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('placeholder');
 
@@ -92,12 +92,12 @@ export async function saveDocument(collectionPath: string, docId: string, data: 
   }
 
   try {
-    const docRef = doc(db, collectionPath, docId);
-    await setDoc(docRef, {
+    const colRef = collection(db, collectionPath);
+    await addDoc(colRef, {
       ...data,
       createdAt: serverTimestamp()
     });
   } catch (error) {
-    handleFirestoreError(error, OperationType.CREATE, `${collectionPath}/${docId}`);
+    handleFirestoreError(error, OperationType.CREATE, `${collectionPath}/(auto-id)`);
   }
 }

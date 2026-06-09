@@ -140,7 +140,7 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
       setSurfaceMaterial('CANADIAN_MAPLE');
       setSubbase('SQUASH_DOUBLE_BATTEN');
     } else if (type === 'GYM') {
-      setSurfaceMaterial('CANADIAN_MAPLE');
+      setSurfaceMaterial('GYM_RUBBER');
       setSubbase('GYM_ACOUSTIC_SLAB');
     } else if (type === 'BASKETBALL' || type === 'BADMINTON' || type === 'VOLLEYBALL') {
       setSurfaceMaterial('CANADIAN_MAPLE');
@@ -391,17 +391,16 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
               {/* Material Radios */}
               <div className="space-y-3">
                 {Object.values(SURFACE_MATERIALS).filter((material) => {
-                  if (sportType === 'SWIMMING_POOL') {
-                    return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(material.id);
-                  } else if (sportType === 'SQUASH') {
-                    return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(material.id);
-                  } else if (sportType === 'FOOTBALL') {
-                    return ['COMPOSITE_TURF'].includes(material.id);
-                  } else if (sportType === 'TRACK_FIELD') {
-                    return !['COMPOSITE_TURF', 'CANADIAN_MAPLE', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
-                  } else {
-                    return !['COMPOSITE_TURF', 'MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER', 'ARMOURCOAT_WALLS'].includes(material.id);
-                  }
+                  const isGym = sportType === 'GYM';
+                  const isGymMaterial = ['GYM_RUBBER', 'GYM_VINYL', 'GYM_FOAM', 'GYM_TURF', 'GYM_CORK'].includes(material.id);
+
+                  if (isGym) return isGymMaterial;
+                  if (sportType === 'SWIMMING_POOL') return ['MOSAIC_CLASSIC', 'GLASS_BEAD_PLASTER', 'REINFORCED_PVC_LINER'].includes(material.id);
+                  if (sportType === 'SQUASH') return ['CANADIAN_MAPLE', 'ARMOURCOAT_WALLS'].includes(material.id);
+                  if (sportType === 'FOOTBALL') return ['COMPOSITE_TURF'].includes(material.id);
+                  if (sportType === 'CRICKET') return ['COMPOSITE_TURF'].includes(material.id);
+                  if (sportType === 'TRACK_FIELD') return ['PRO_ACRYLIC', 'PP_TILES', 'COMPOSITE_TURF'].includes(material.id);
+                  return ['CANADIAN_MAPLE', 'PRO_ACRYLIC', 'PP_TILES'].includes(material.id);
                 }).map((material) => {
                   const isSelected = surfaceMaterial === material.id;
 
@@ -578,30 +577,60 @@ export const InteractiveBuilder: React.FC<InteractiveBuilderProps> = ({ config, 
                 }).map((sub) => {
                   const isSelected = subbase === sub.id;
                   return (
-                    <motion.button
-                      key={sub.id}
-                      onClick={() => setSubbase(sub.id)}
-                      id={`subbase-opt-${sub.id}`}
-                      whileHover={{ scale: 1.03, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer ${
-                        isSelected
-                          ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
-                          : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone'
-                      }`}
+                    <div 
+                      key={sub.id} 
+                      className="relative w-full"
+                      onMouseEnter={() => setActiveTooltip(`subbase-${sub.id}`)}
+                      onMouseLeave={() => setActiveTooltip(null)}
+                      onFocus={() => setActiveTooltip(`subbase-${sub.id}`)}
+                      onBlur={() => setActiveTooltip(null)}
                     >
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="font-bold text-xs sm:text-sm text-brand-stone leading-tight block">{sub.name}</span>
-                          {isSelected && <span className="h-2 w-2 rounded-full bg-brand-sage" />}
+                      <motion.button
+                        onClick={() => setSubbase(sub.id)}
+                        id={`subbase-opt-${sub.id}`}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer w-full h-full ${
+                          isSelected
+                            ? 'bg-brand-sage-soft border-brand-sage text-brand-stone'
+                            : 'bg-brand-cream/20 border-stone-200 hover:border-stone-400 text-stone-500 hover:text-brand-stone'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-bold text-xs sm:text-sm text-brand-stone leading-tight block">{sub.name}</span>
+                            {isSelected && <span className="h-2 w-2 rounded-full bg-brand-sage" />}
+                          </div>
+                          <span className="text-[11px] text-stone-500 leading-normal block mb-3">{sub.description}</span>
                         </div>
-                        <span className="text-[11px] text-stone-500 leading-normal block mb-3">{sub.description}</span>
-                      </div>
-                      <div className="pt-2 border-t border-stone-100 mt-auto flex justify-end items-center text-[10px] text-stone-400 font-mono">
-                        <span className="text-brand-sage font-bold">{sub.durability.split(' - ')[0]}</span>
-                      </div>
-                    </motion.button>
+                        <div className="pt-2 border-t border-stone-100 mt-auto flex justify-end items-center text-[10px] text-stone-400 font-mono">
+                          <span className="text-brand-sage font-bold">{sub.durability.split(' - ')[0]}</span>
+                        </div>
+                      </motion.button>
+                      <AnimatePresence>
+                        {activeTooltip === `subbase-${sub.id}` && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute z-[60] bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 bg-[#0E0E0E] border border-white/10 text-stone-200 text-xs rounded-xl shadow-2xl p-4 pointer-events-none text-left"
+                          >
+                            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0E0E0E] border-b border-r border-white/10 rotate-45 transform" />
+                            <div className="font-bold text-white mb-2 flex items-center gap-1.5">
+                              <Info className="w-4 h-4 text-brand-sage" />
+                              Performance Details
+                            </div>
+                            <div className="space-y-1.5 text-[11px] leading-relaxed">
+                              {sub.description && <div><span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-0.5">Description</span> {sub.description}</div>}
+                              {sub.durability && <div><span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-0.5">Durability</span> {sub.durability}</div>}
+                              {sub.bestFor && <div><span className="text-stone-400 font-semibold uppercase tracking-wider text-[9px] block mb-0.5">Best For</span> {sub.bestFor}</div>}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   );
                 })}
               </div>

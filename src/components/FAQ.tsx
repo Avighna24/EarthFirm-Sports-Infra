@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { saveDocument } from '../firebase';
+import { saveDocument } from './firebase';
 
 // Import high-fidelity squash court visual asset
 import squashCourtImg from '../assets/images/squash_court_1780661148365.png';

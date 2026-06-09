@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock, Globe, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
+import bannerCover from '../assets/images/banner_cover.png.png';
 
 const staggerItem = {
   hidden: { opacity: 0, y: 25 },
@@ -189,6 +190,13 @@ export function ContactUs() {
                         <Linkedin className="h-4 w-4" />
                         <span className="sr-only">LinkedIn</span>
                       </a>
+                      <a 
+                        href="mailto:sportsinfraearthfirm@gmail.com" 
+                        className="flex items-center justify-center p-2.5 rounded-lg bg-neutral-900 border border-neutral-800/80 text-brand-sage hover:text-white hover:bg-brand-sage hover:border-transparent transition-all duration-300 hover:scale-110 shadow-md hover:shadow-brand-sage/20"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <span className="sr-only">Email</span>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -200,6 +208,11 @@ export function ContactUs() {
           </motion.div>
 
         </div>
+
+        {/* Banner Cover */}
+        <motion.div variants={staggerItem} className="mt-12">
+          <img src={bannerCover} alt="Earthfirm Sports Cover" className="w-full rounded-2xl shadow-xl" />
+        </motion.div>
 
       </div>
     </section>

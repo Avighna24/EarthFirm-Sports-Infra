@@ -8,7 +8,7 @@ import { CourtConfiguration } from '../types';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES, SMART_FEATURES } from '../constants';
 import { Mail, Phone, MapPin, Sparkles, Clock, CheckCircle2, FileText, Download, Briefcase, Landmark } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-import { saveDocument } from '../firebase';
+import { saveDocument } from './firebase';
 
 interface ContactRFPProps {
   config: CourtConfiguration;

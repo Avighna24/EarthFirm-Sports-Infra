@@ -2182,11 +2182,7 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
              </group>
            ))}
            
-           {/* Box Cricket Full Turf Netting Cage */}
-           <Box args={[courtW, 3.5, courtL]} position={[0, 1.75, 0]}>
-             <meshStandardMaterial color="#374151" transparent opacity={0.25} wireframe />
-           </Box>
-            <SimulatedBall sportType="CRICKET" courtL={courtL} courtW={courtW} animate={animatePlayers} visible={visualizePlayers} />
+           <SimulatedBall sportType="CRICKET" courtL={courtL} courtW={courtW} animate={animatePlayers} visible={visualizePlayers} />
         </group>
       )}
 
@@ -2696,9 +2692,30 @@ const CourtScene: React.FC<{ config: CourtConfiguration }> = ({ config }) => {
 
       {/* Fencing */}
       {selectedSmartFeatures.includes('PERIPHERAL_FENCING') && (
-         <Box args={[runoutW, 2, runoutL]} position={[0, 1, 0]} receiveShadow>
-            <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
-         </Box>
+         <group>
+            {/* North */}
+            <Box args={[runoutW, 2, 0.1]} position={[0, 1, runoutL/2]} receiveShadow>
+               <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
+            </Box>
+            {/* South */}
+            <Box args={[runoutW, 2, 0.1]} position={[0, 1, -runoutL/2]} receiveShadow>
+               <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
+            </Box>
+            {/* East */}
+            <Box args={[0.1, 2, runoutL]} position={[runoutW/2, 1, 0]} receiveShadow>
+               <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
+            </Box>
+            {/* West */}
+            <Box args={[0.1, 2, runoutL]} position={[-runoutW/2, 1, 0]} receiveShadow>
+               <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
+            </Box>
+            {/* Top */}
+            {(sportType === 'CRICKET' || sportType === 'FOOTBALL') && (
+              <Box args={[runoutW, 0.1, runoutL]} position={[0, 2, 0]} receiveShadow>
+                <meshStandardMaterial color="#6b7280" transparent opacity={0.3} wireframe />
+              </Box>
+            )}
+         </group>
       )}
 
       {/* Dynamic Professional Teams mapping */}

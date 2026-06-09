@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, Variants } from 'motion/react';
 import { NavBar } from './components/NavBar';
 import { Hero } from './components/Hero';
 import { AboutUs } from './components/AboutUs';
@@ -13,10 +13,13 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { BudgetPlanner } from './components/BudgetPlanner';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
+import { Careers } from './components/Careers';
 import { FloatingActions } from './components/FloatingActions';
 import { CourtConfiguration } from './types';
+import { saveDocument } from './components/firebase';
 import { Landmark, Trophy, ShieldCheck, Zap, Info, ArrowUp, Sparkles, MapPin, Mail, Phone, Clock, Globe, Building, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
+import { ScrollAnimate } from './components/ScrollAnimate';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -29,9 +32,29 @@ const staggerContainer = {
   }
 };
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.7, ease: 'easeOut' as const } 
+  }
+};
+
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
-  
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+
+  const handleNewsletterSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    await saveDocument('newsletter_signups', '', { email: newsletterEmail });
+    setNewsletterSubmitted(true);
+    setNewsletterEmail('');
+    setTimeout(() => setNewsletterSubmitted(false), 3000);
+  };
+
   // Real-time SPA Path routing
   const [currentPath, setCurrentPath] = useState(() => {
     if (window.location.hash) {
@@ -122,7 +145,7 @@ export default function App() {
   };
 
   const handleScrollToContact = (elementId: string) => {
-    if (isPlanningPage || isFAQPage || isAboutPage) {
+    if (isPlanningPage || isFAQPage || isAboutPage || isCareersPage) {
       navigateTo('/');
       setTimeout(() => {
         scrollSmoothTo(elementId);
@@ -136,6 +159,7 @@ export default function App() {
   const isPlanningPage = currentPath === '/budget-planning' || currentPath === '/budget-planning/';
   const isFAQPage = currentPath === '/faq' || currentPath === '/faq/';
   const isAboutPage = currentPath === '/about-us' || currentPath === '/about-us/';
+  const isCareersPage = currentPath === '/careers' || currentPath === '/careers/';
 
   if (isPlanningPage) {
     return (
@@ -167,6 +191,16 @@ export default function App() {
     );
   }
 
+  if (isCareersPage) {
+    return (
+      <div className="flex flex-col min-h-screen font-sans">
+        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+        <Careers onBackToMain={() => navigateTo('/')} />
+        <FloatingActions onScrollToContact={handleScrollToContact} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-brand-cream/30 text-brand-stone font-sans selection:bg-brand-sage/20 selection:text-brand-stone">
       
@@ -174,9 +208,9 @@ export default function App() {
 
       {/* 1. HERO SECTION */}
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
       >
         <Hero
           onStartCustomizer={() => scrollSmoothTo('arena-configurator')}
@@ -191,37 +225,37 @@ export default function App() {
       </motion.div>
 
       {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
+      <ScrollAnimate
+        direction="up"
+        duration={800}
+        threshold={0.05}
+        margin="0px 0px -100px 0px"
       >
         <InteractiveBuilder
           config={activeConfig}
           onConfigChange={setActiveConfig}
           triggerScrollToContact={() => scrollSmoothTo('assessment-rfp')}
         />
-      </motion.div>
+      </ScrollAnimate>
 
       {/* 3. MATERIAL PORTFOLIO TAB LAB & CROSS SECTION EXPLODER */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
+      <ScrollAnimate
+        direction="up"
+        duration={800}
+        threshold={0.05}
+        margin="0px 0px -100px 0px"
       >
         <ProductCatalog />
-      </motion.div>
+      </ScrollAnimate>
 
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
+      <ScrollAnimate
+        direction="up"
+        duration={800}
+        threshold={0.05}
+        margin="0px 0px -100px 0px"
       >
         <ContactUs />
-      </motion.div>
+      </ScrollAnimate>
 
       {/* FOOTER */}
       <footer className="bg-brand-stone text-brand-cream/80 py-16 text-xs font-sans">
@@ -266,7 +300,7 @@ export default function App() {
               </div>
 
               <h5 className="font-bold font-mono uppercase text-white mb-3 tracking-widest text-[11px]">Follow Us</h5>
-              <div className="flex gap-4">
+              <div className="flex gap-4 mb-8">
                 <a 
                   href="https://www.instagram.com/earthfirm_sportsinfra/" 
                   target="_blank" 
@@ -294,7 +328,42 @@ export default function App() {
                   <Linkedin className="h-5 w-5" />
                   <span className="sr-only">LinkedIn</span>
                 </a>
+                <a 
+                  href="mailto:sportsinfraearthfirm@gmail.com" 
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800/80 text-brand-sage hover:text-white hover:bg-brand-sage hover:border-transparent transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-brand-sage/20"
+                >
+                  <Mail className="h-5 w-5" />
+                  <span className="sr-only">Email</span>
+                </a>
               </div>
+
+              <h5 className="font-bold font-mono uppercase text-white mb-3 tracking-widest text-[11px]">Stay Updated</h5>
+              <form onSubmit={handleNewsletterSignup} className="flex gap-2 relative">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="bg-neutral-900/50 border border-neutral-800 rounded-lg px-4 py-2 text-xs text-white focus:outline-none focus:border-brand-sage flex-grow"
+                />
+                <button
+                  type="submit"
+                  className="bg-brand-sage text-black font-bold text-[10px] px-3 py-2 rounded-lg hover:bg-white transition"
+                >
+                  JOIN
+                </button>
+                {newsletterSubmitted && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute -top-10 right-0 bg-brand-sage text-black text-[10px] font-bold px-3 py-1 rounded-full shadow-lg"
+                  >
+                    Subscribed!
+                  </motion.div>
+                )}
+              </form>
             </div>
 
           </div>

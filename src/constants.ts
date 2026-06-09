@@ -293,6 +293,75 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterialDetails> = {
       { name: 'Fibre-Reinforced Base Render', thickness: '10mm', desc: 'Dent resistance & sound deadening layer' },
       { name: 'Undercoat Primer and Adhesive Resin', thickness: '1.5mm', desc: 'Solid bond to structural brickwork' }
     ]
+  },
+  GYM_RUBBER: {
+    id: 'GYM_RUBBER',
+    name: 'Heavy-Duty Vulcanized Rubber',
+    category: 'Indoor',
+    description: 'High-density vulcanized rubber flooring offering superior impact resistance and vibration dampening for heavy weight areas.',
+    costPerSqFt: 550.00,
+    thickness: '10mm - 15mm Roll/Tile',
+    warranty: '10 Years Durability',
+    features: ['High traction', 'Vibration dampening', 'Impact resistant'],
+    crossSectionLayers: [
+      { name: 'Vulcanized Rubber Surface', thickness: '5mm', desc: 'Textured impact-resistant top' },
+      { name: 'High-Density Rubber Underlay', thickness: '5-10mm', desc: 'Vibration absorbing base' }
+    ]
+  },
+  GYM_VINYL: {
+    id: 'GYM_VINYL',
+    name: 'Industrial Vinyl Sport Flooring',
+    category: 'Indoor',
+    description: 'Durable, low-maintenance vinyl flooring with excellent slip resistance and comfortable underfoot feeling.',
+    costPerSqFt: 450.00,
+    thickness: '6mm Multi-layer Composition',
+    warranty: '8 Years Wear Guarantee',
+    features: ['Slip resistant', 'Easy to clean', 'Multi-color options'],
+    crossSectionLayers: [
+      { name: 'Reinforced Wear Layer', thickness: '1mm', desc: 'High-durability top coat' },
+      { name: 'Vinyl Cushion Core', thickness: '5mm', desc: 'Shock-attenuating base layer' }
+    ]
+  },
+  GYM_FOAM: {
+    id: 'GYM_FOAM',
+    name: 'High-Density Impact Foam',
+    category: 'Indoor',
+    description: 'Soft yet supportive foam flooring, ideal for yoga, aerobics, and warm-up areas.',
+    costPerSqFt: 250.00,
+    thickness: '20mm - 40mm Interlocking Tiles',
+    warranty: '5 Years Comfort Guarantee',
+    features: ['Comfortable cushion', 'Ergonomic support', 'Lightweight'],
+    crossSectionLayers: [
+      { name: 'Anti-Fatigue Foam Layer', thickness: '20-40mm', desc: 'High-resilience foam core' }
+    ]
+  },
+  GYM_TURF: {
+    id: 'GYM_TURF',
+    name: 'Performance Gym Turf',
+    category: 'Indoor',
+    description: 'Engineered short-pile turf for sled pushes, speed training, and functional workouts.',
+    costPerSqFt: 600.00,
+    thickness: '12mm - 15mm Pile',
+    warranty: '7 Years Durability',
+    features: ['High-resistance fibers', 'Sled-friendly', 'Excellent durability'],
+    crossSectionLayers: [
+      { name: 'Short-Pile UV-Inhibited Fibers', thickness: '10mm', desc: 'Dense synthetic grass mat' },
+      { name: 'Shockpad Underlayment', thickness: '5mm', desc: 'Impact management layer' }
+    ]
+  },
+  GYM_CORK: {
+    id: 'GYM_CORK',
+    name: 'Sustainable Cork Flooring',
+    category: 'Indoor',
+    description: 'Eco-friendly and naturally cushioned flooring, providing excellent acoustic dampening and thermal insulation.',
+    costPerSqFt: 700.00,
+    thickness: '8mm - 12mm Tiles',
+    warranty: '10 Years Eco-Guarantee',
+    features: ['Acoustic insulation', 'Naturally antimicrobial', 'Sustainable'],
+    crossSectionLayers: [
+      { name: 'Protective Wear Layer', thickness: '0.5mm', desc: 'Sealant coat' },
+      { name: 'Compressed Cork Core', thickness: '7.5-11.5mm', desc: 'Natural sound/impact dampening' }
+    ]
   }
 };
 
@@ -491,6 +560,14 @@ export const SMART_FEATURES: SmartFeature[] = [
     cost: 115000,
     category: 'Hardware',
     sports: ['CRICKET']
+  },
+  {
+    id: 'PERIPHERAL_FENCING',
+    name: 'Heavy-Duty Peripheral Court Netting',
+    description: 'High-tensile steel frame with weather-resistant netting around the perimeter to contain balls',
+    cost: 95000,
+    category: 'Hardware',
+    sports: ['BASKETBALL', 'CRICKET', 'TENNIS', 'PICKLEBALL', 'FOOTBALL']
   },
   // Badminton specific
   {

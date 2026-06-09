@@ -75,6 +75,22 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp" }
       },
       "required": ["fullName", "email", "location", "totalCost", "hashCode"]
+    },
+    "JobApplication": {
+      "title": "JobApplication",
+      "description": "Job career application submitted by potential candidate",
+      "type": "object",
+      "properties": {
+        "roleId": { "type": "string", "description": "Candidate target role ID" },
+        "roleTitle": { "type": "string", "description": "Display title of targeted job" },
+        "fullName": { "type": "string", "description": "Full legal name of candidate" },
+        "email": { "type": "string", "format": "email", "description": "Candidate email address" },
+        "phone": { "type": "string", "description": "Candidate telephone contact" },
+        "experienceYear": { "type": "string", "description": "Self-selected experience band or years" },
+        "coverLetter": { "type": "string", "description": "Detailed pitch or professional cover note" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Local ISO creation time" }
+      },
+      "required": ["roleId", "roleTitle", "fullName", "email", "phone", "experienceYear", "coverLetter"]
     }
   },
   "firestore": {
@@ -93,6 +109,10 @@
     "/interactive_consultations/{id}": {
       "schema": "InteractiveConsultation",
       "description": "Submissions on customizer RFP panel"
+    },
+    "/job_applications/{id}": {
+      "schema": "JobApplication",
+      "description": "Submitted job applications for Earthfirm sports construction positions"
     }
   }
 }

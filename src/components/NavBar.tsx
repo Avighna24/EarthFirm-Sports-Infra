@@ -46,12 +46,6 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8 lg:gap-12">
           <button
-            onClick={() => onNavigateTo('/')}
-            className="text-sm font-semibold tracking-wider uppercase text-gray-400 hover:text-white cursor-pointer transition-colors whitespace-nowrap"
-          >
-            Home
-          </button>
-          <button
             onClick={() => onNavigateTo('/about-us')}
             data-testid="nav-about"
             className="text-sm font-semibold tracking-wider uppercase text-gray-400 hover:text-white cursor-pointer transition-colors whitespace-nowrap"
@@ -77,6 +71,12 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
             className="text-sm font-semibold tracking-wider uppercase text-gray-400 hover:text-white cursor-pointer transition-colors whitespace-nowrap"
           >
             FAQ
+          </button>
+          <button
+            onClick={() => onNavigateTo('/careers')}
+            className="text-sm font-semibold tracking-wider uppercase text-gray-400 hover:text-white cursor-pointer transition-colors whitespace-nowrap"
+          >
+            Careers
           </button>
           <button
             onClick={() => handleNavClick('contact-operations', '/')}
@@ -112,12 +112,6 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
           >
             <div className="flex flex-col gap-1 px-4 py-6 text-center">
               <button
-                onClick={() => handleMobileRouteClick('/')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                Home
-              </button>
-              <button
                 onClick={() => handleMobileRouteClick('/about-us')}
                 className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
               >
@@ -140,6 +134,12 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
                 className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
               >
                 FAQ
+              </button>
+              <button
+                onClick={() => handleMobileRouteClick('/careers')}
+                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
+              >
+                Careers
               </button>
               <button
                 onClick={() => handleNavClick('contact-operations', '/')}

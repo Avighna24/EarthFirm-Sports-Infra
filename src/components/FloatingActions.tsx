@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, PhoneCall, Mail, Navigation, Calendar, X, CheckSquare, ShieldCheck, Sparkles, User, Phone, MapPin, Send } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
-import { saveDocument } from '../firebase';
+import { saveDocument } from './firebase';
 
 interface FloatingActionsProps {
   onScrollToContact: (elementId: string) => void;
@@ -117,6 +117,20 @@ export function FloatingActions({ onScrollToContact }: FloatingActionsProps) {
 
   return (
     <>
+      {/* SUCCESS TOAST */}
+      <AnimatePresence>
+        {isSubmitted && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-24 right-6 z-60 bg-amber-500 text-black px-6 py-3 rounded-full shadow-2xl font-bold text-sm tracking-wide"
+          >
+            Inquiry received successfully!
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* PERSISTENT FLOATING CONTAINER */}
       <div 
         id="global-floating-widget"

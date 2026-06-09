@@ -17,7 +17,7 @@ export interface SportDetails {
   basePricePerSqFt: number;
 }
 
-export type SurfaceMaterialType = 'CANADIAN_MAPLE' | 'PRO_ACRYLIC' | 'PP_TILES' | 'COMPOSITE_TURF' | 'MOSAIC_CLASSIC' | 'GLASS_BEAD_PLASTER' | 'REINFORCED_PVC_LINER' | 'ARMOURCOAT_WALLS';
+export type SurfaceMaterialType = 'CANADIAN_MAPLE' | 'PRO_ACRYLIC' | 'PP_TILES' | 'COMPOSITE_TURF' | 'MOSAIC_CLASSIC' | 'GLASS_BEAD_PLASTER' | 'REINFORCED_PVC_LINER' | 'ARMOURCOAT_WALLS' | 'GYM_RUBBER' | 'GYM_VINYL' | 'GYM_FOAM' | 'GYM_TURF' | 'GYM_CORK';
 
 export interface SurfaceMaterialDetails {
   id: SurfaceMaterialType;
