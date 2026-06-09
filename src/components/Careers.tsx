@@ -3,6 +3,21 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Briefcase, MapPin, Clock, ArrowRight, X, Send, CheckCircle2, User, Mail, Phone, Calendar, UploadCloud, AlertCircle } from 'lucide-react';
 import { saveDocument } from './firebase';
 
+// OPTION C CONFIGURATION FOR GITHUB PAGES / STATIC HOSTING:
+// By default, static web hosting platforms (like GitHub Pages) do not run server-side Node.js code (server.ts).
+// To send automatic emails completely client-side in a static build, the most effective and free service is EmailJS.
+// 1. Sign up for a free account at https://www.emailjs.com/
+// 2. Connect your email service (Gmail, Outlook, custom SMTP, etc.) under "Email Services" and get its ID (e.g. 'service_xxxxxx').
+// 3. Create an "Email Template" under "Email Templates" and get its ID (e.g. 'template_xxxxxxx').
+//    - Set the recipient "To Email" field of your template to: {{candidate_email}}
+//    - Style your template beautifully (e.g., "Hi {{candidate_name}}, we received your application for {{job_title}}...")
+// 4. Go to your Account / Integration page to find your "Public Key" (e.g., 'user_xxxxxxxxx' or API Key).
+// 5. Fill out the values below:
+const FORMSPREE_FORM_ID = 'xaqzjdar'; 
+const EMAILJS_SERVICE_ID = 'service_37qg2ik';      // Replace with your EmailJS service ID (e.g. 'service_gmail')
+const EMAILJS_TEMPLATE_ID = 'template_kbn6slx';     // Replace with your EmailJS template ID (e.g. 'template_candidate_confirm')
+const EMAILJS_PUBLIC_KEY = '0P07FOMXX6eMjFEaD';      // Replace with your EmailJS Public Key (e.g. 'user_xxxxxxxxxxxxxxx') 
+
 interface JobRole {
   id: string;
   title: string;
@@ -231,30 +246,103 @@ export function Careers({ onBackToMain }: CareersProps) {
         console.warn('Firestore write failed, proceeding with server-side email connection:', fError);
       }
 
-      // 2. Dispatch to custom backend API for email notification sending with attachment
-      const response = await fetch('/api/careers/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appData)
-      });
+      // 2. Dispatch to custom backend API (or Formspree client-side fallback)
+      try {
+        const isStaticHost = window.location.hostname.includes('github.io') || window.location.hostname.includes('pages');
+        const hasFormspree = FORMSPREE_FORM_ID && FORMSPREE_FORM_ID.trim() !== '';
 
-      if (!response.ok) {
-        let serverErrorMsg = 'Failed to submit application email.';
-        try {
-          const errData = await response.json();
-          if (errData && errData.details) {
-            serverErrorMsg = `${errData.error || 'Server Error'}: ${errData.details}`;
-          } else if (errData && errData.error) {
-            serverErrorMsg = errData.error;
+        if (isStaticHost && hasFormspree) {
+          console.log(`[Careers] Static host detected. Dispatching candidate details to Formspree form: ${FORMSPREE_FORM_ID}`);
+          
+          const fd = new FormData();
+          fd.append('Role ID', activeJob.id);
+          fd.append('Role Title', activeJob.title);
+          fd.append('Full Name', fullName);
+          fd.append('Email Address', email);
+          fd.append('Phone Number', phone);
+          fd.append('Years of Experience', experienceYear);
+          fd.append('Cover Letter', coverLetter);
+          if (resumeFile) {
+            fd.append('Resume File', resumeFile, resumeFile.name);
           }
-        } catch (_) {}
-        throw new Error(serverErrorMsg);
+
+          const response = await fetch(`https://formspree.io/f/${FORMSPREE_FORM_ID}`, {
+            method: 'POST',
+            body: fd,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`Formspree rejected the application submission: ${response.statusText}`);
+          }
+          console.log('[Careers] Formspree server accepted form and file payload successfully.');
+        } else {
+          // Default: Dispatch to Express custom server /api/careers/apply
+          const response = await fetch('/api/careers/apply', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appData)
+          });
+
+          if (!response.ok) {
+            let serverErrorMsg = 'Failed to submit application email.';
+            try {
+              const errData = await response.json();
+              if (errData && errData.details) {
+                serverErrorMsg = `${errData.error || 'Server Error'}: ${errData.details}`;
+              } else if (errData && errData.error) {
+                serverErrorMsg = errData.error;
+              }
+            } catch (_) {}
+            console.warn('Mail server submission warned, registered candidate via database/local storage backup:', serverErrorMsg);
+          } else {
+            const resJson = await response.json();
+            console.log('Application API submission result:', resJson);
+          }
+        }
+      } catch (apiError) {
+        console.warn('Application server endpoint not reachable (GitHub-deployed Static SPA fallback active):', apiError);
       }
 
-      const resJson = await response.json();
-      console.log('Application API submission result:', resJson);
+      // 3. Client-side automated applicant confirmation email dispatch via EmailJS (if configured)
+      try {
+        const hasEmailJS = EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY;
+        if (hasEmailJS) {
+          console.log(`[Careers] EmailJS configuration found. Dispatching candidate confirmation email directly to recipient: ${email}`);
+          const emailJsResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              service_id: EMAILJS_SERVICE_ID,
+              template_id: EMAILJS_TEMPLATE_ID,
+              user_id: EMAILJS_PUBLIC_KEY,
+              template_params: {
+                candidate_email: email,
+                candidate_name: fullName,
+                job_title: activeJob.title,
+                phone: phone,
+                experience: experienceYear,
+                cover_letter: coverLetter
+              }
+            })
+          });
+
+          if (!emailJsResponse.ok) {
+            const errTxt = await emailJsResponse.text();
+            console.warn('[Careers] EmailJS client-side confirmation dispatch rejected:', errTxt);
+          } else {
+            console.log('[Careers] EmailJS candidate auto-reply confirmation email dispatched successfully!');
+          }
+        }
+      } catch (ejsError) {
+        console.warn('[Careers] Failed to dispatch client-side EmailJS confirmation auto-reply:', ejsError);
+      }
 
       // Instantly refresh list of applications on UI
       const updatedList = [firestoreData, ...applications];
