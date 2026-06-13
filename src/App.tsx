@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion, Variants } from 'motion/react';
+import { motion, Variants, AnimatePresence } from 'motion/react';
 import { NavBar } from './components/NavBar';
 import { Hero } from './components/Hero';
 import { AboutUs } from './components/AboutUs';
@@ -14,9 +14,13 @@ import { BudgetPlanner } from './components/BudgetPlanner';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
 import { Careers } from './components/Careers';
+import { AdminDashboard } from './components/AdminDashboard';
 import { FloatingActions } from './components/FloatingActions';
+import { Portfolio } from './components/Portfolio';
+import { Testimonials } from './components/Testimonials';
+import { Partners } from './components/Partners';
 import { CourtConfiguration } from './types';
-import { saveDocument } from './components/firebase';
+import { saveToLocalRegistry } from './lib/storage';
 import { Landmark, Trophy, ShieldCheck, Zap, Info, ArrowUp, Sparkles, MapPin, Mail, Phone, Clock, Globe, Building, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { ScrollAnimate } from './components/ScrollAnimate';
@@ -49,7 +53,7 @@ export default function App() {
   const handleNewsletterSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail) return;
-    await saveDocument('newsletter_signups', '', { email: newsletterEmail });
+    saveToLocalRegistry('newsletter_signups', { email: newsletterEmail, timestamp: new Date().toISOString() });
     setNewsletterSubmitted(true);
     setNewsletterEmail('');
     setTimeout(() => setNewsletterSubmitted(false), 3000);
@@ -160,58 +164,85 @@ export default function App() {
   const isFAQPage = currentPath === '/faq' || currentPath === '/faq/';
   const isAboutPage = currentPath === '/about-us' || currentPath === '/about-us/';
   const isCareersPage = currentPath === '/careers' || currentPath === '/careers/';
+  const isAdminPage = currentPath === '/admin' || currentPath === '/admin/';
+
+  // Page variants for transitions
+  const pageVariants = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+    transition: { duration: 0.4, ease: 'easeInOut' as const }
+  };
+
+  if (isAdminPage) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div key="admin" {...pageVariants}>
+          <AdminDashboard onBackToMain={() => navigateTo('/')} />
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   if (isPlanningPage) {
     return (
-      <div className="flex flex-col min-h-screen font-sans">
-        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
-        <BudgetPlanner onBackToMain={() => navigateTo('/')} language={language} />
-        <FloatingActions onScrollToContact={handleScrollToContact} />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key="planning" {...pageVariants} className="flex flex-col min-h-screen font-sans">
+          <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+          <BudgetPlanner onBackToMain={() => navigateTo('/')} language={language} />
+          <FloatingActions onScrollToContact={handleScrollToContact} />
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
   if (isFAQPage) {
     return (
-      <div className="flex flex-col min-h-screen font-sans">
-        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
-        <FAQ onBackToMain={() => navigateTo('/')} language={language} />
-        <FloatingActions onScrollToContact={handleScrollToContact} />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key="faq" {...pageVariants} className="flex flex-col min-h-screen font-sans">
+          <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+          <FAQ onBackToMain={() => navigateTo('/')} language={language} />
+          <FloatingActions onScrollToContact={handleScrollToContact} />
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
   if (isAboutPage) {
     return (
-      <div className="flex flex-col min-h-screen font-sans">
-        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
-        <AboutUs onBackToMain={() => navigateTo('/')} />
-        <FloatingActions onScrollToContact={handleScrollToContact} />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key="about" {...pageVariants} className="flex flex-col min-h-screen font-sans">
+          <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+          <AboutUs onBackToMain={() => navigateTo('/')} />
+          <FloatingActions onScrollToContact={handleScrollToContact} />
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
   if (isCareersPage) {
     return (
-      <div className="flex flex-col min-h-screen font-sans">
-        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
-        <Careers onBackToMain={() => navigateTo('/')} />
-        <FloatingActions onScrollToContact={handleScrollToContact} />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key="careers" {...pageVariants} className="flex flex-col min-h-screen font-sans">
+          <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+          <Careers onBackToMain={() => navigateTo('/')} />
+          <FloatingActions onScrollToContact={handleScrollToContact} />
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
   return (
-    <div className="min-h-screen bg-brand-cream/30 text-brand-stone font-sans selection:bg-brand-sage/20 selection:text-brand-stone">
-      
-      <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
-
-      {/* 1. HERO SECTION */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
+    <AnimatePresence mode="wait">
+      <motion.div 
+        key="home" 
+        {...pageVariants}
+        className="min-h-screen bg-brand-cream/30 text-brand-stone font-sans selection:bg-brand-sage/20 selection:text-brand-stone"
       >
+        
+        <NavBar onNavigateHome={() => navigateTo('/')} onNavigateTo={navigateTo} onScrollTo={scrollSmoothTo} />
+
+        {/* 1. HERO SECTION */}
         <Hero
           onStartCustomizer={() => scrollSmoothTo('arena-configurator')}
           onViewCatalog={() => scrollSmoothTo('materials-portfolio')}
@@ -222,43 +253,74 @@ export default function App() {
             }, 80);
           }}
         />
-      </motion.div>
 
-      {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
-      <ScrollAnimate
-        direction="up"
-        duration={800}
-        threshold={0.05}
-        margin="0px 0px -100px 0px"
-      >
-        <InteractiveBuilder
-          config={activeConfig}
-          onConfigChange={setActiveConfig}
-          triggerScrollToContact={() => scrollSmoothTo('assessment-rfp')}
-        />
-      </ScrollAnimate>
+        {/* 2. INTERACTIVE BUILDER & LIVE VISUAL ESTIMATOR */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <InteractiveBuilder
+            config={activeConfig}
+            onConfigChange={setActiveConfig}
+            triggerScrollToContact={() => scrollSmoothTo('assessment-rfp')}
+          />
+        </ScrollAnimate>
 
-      {/* 3. MATERIAL PORTFOLIO TAB LAB & CROSS SECTION EXPLODER */}
-      <ScrollAnimate
-        direction="up"
-        duration={800}
-        threshold={0.05}
-        margin="0px 0px -100px 0px"
-      >
-        <ProductCatalog />
-      </ScrollAnimate>
+        {/* 2.5 PORTFOLIO SHOWCASE */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <Portfolio />
+        </ScrollAnimate>
 
-      <ScrollAnimate
-        direction="up"
-        duration={800}
-        threshold={0.05}
-        margin="0px 0px -100px 0px"
-      >
-        <ContactUs />
-      </ScrollAnimate>
+        {/* 3. MATERIAL PORTFOLIO TAB LAB & CROSS SECTION EXPLODER */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <ProductCatalog />
+        </ScrollAnimate>
+
+        {/* 3.5 CLIENT TESTIMONIALS */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <Testimonials />
+        </ScrollAnimate>
+
+        {/* 4. STRATEGIC PARTNERS (Moved above ContactUs) */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <Partners />
+        </ScrollAnimate>
+
+        {/* 5. CONTACT US (Moved below Partners) */}
+        <ScrollAnimate
+          direction="up"
+          duration={800}
+          threshold={0.05}
+          margin="0px 0px -100px 0px"
+        >
+          <ContactUs />
+        </ScrollAnimate>
+
 
       {/* FOOTER */}
-      <footer className="bg-brand-stone text-brand-cream/80 py-16 text-xs font-sans">
+      <footer className="bg-brand-stone text-brand-cream/80 py-16 text-xs font-sans relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-12">
@@ -369,8 +431,17 @@ export default function App() {
           </div>
 
           {/* Slogans copyright */}
-          <div className="border-t border-brand-cream/10 pt-8 flex flex-col sm:flex-row justify-between gap-4 text-[10px] text-brand-cream/40 font-mono">
-            <span>&copy; {new Date().getFullYear()} Earthfirm Sports Infrastructures. All architectural designs and software layout rights reserved.</span>
+          <div className="border-t border-brand-cream/10 pt-8 flex flex-col sm:flex-row justify-between gap-4 text-xs text-brand-cream/40 font-mono">
+            <div className="flex items-center gap-1">
+              <span 
+                onClick={() => navigateTo('/admin')}
+                className="cursor-pointer hover:text-brand-sage transition-colors"
+                title="Sovereign Access"
+              >
+                &copy;
+              </span>
+              <span>{new Date().getFullYear()} Earthfirm Sports Infrastructures. All architectural designs and software layout rights reserved.</span>
+            </div>
             <span className="flex items-center gap-1">
               <Sparkles className="h-3 w-3 text-brand-sage animate-pulse" />
               Sovereign Arena Constructors
@@ -379,9 +450,9 @@ export default function App() {
 
         </div>
       </footer>
-
       <FloatingActions onScrollToContact={handleScrollToContact} />
 
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

@@ -1,6 +1,7 @@
 import { MapPin, Globe, ArrowLeft, Trophy, ShieldCheck, Zap, Users, Target, Calendar } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { motion } from 'motion/react';
+import { useCMSData } from '../lib/cms-store';
 
 interface AboutUsProps {
   onBackToMain?: () => void;
@@ -28,6 +29,11 @@ const staggerItem = {
 
 export function AboutUs({ onBackToMain }: AboutUsProps) {
   const { language } = useLanguage();
+  const { data: cmsData } = useCMSData();
+
+  const team = cmsData.team || [];
+  const founders = team.filter(m => m.type === 'FOUNDER');
+  const others = team.filter(m => m.type !== 'FOUNDER');
 
   return (
     <section className="bg-white text-zinc-900 min-h-screen py-16 sm:py-24 border-b border-zinc-200 font-sans selection:bg-zinc-900/10 relative overflow-hidden" id="about-us">
@@ -165,40 +171,71 @@ export function AboutUs({ onBackToMain }: AboutUsProps) {
           </motion.div>
 
           <div className="grid sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-zinc-50 border border-zinc-200 rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center justify-center min-h-[260px] transition-all hover:border-emerald-500/30 group hover:shadow-md active:scale-[0.99]"
-            >
-              <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-emerald-600 mb-5 border border-zinc-200 group-hover:scale-105 transition-transform duration-300">
-                <Users className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-bold text-zinc-900 uppercase tracking-wide">Technical Director</h4>
-              <p className="text-emerald-600 text-xs font-mono mt-1.5 uppercase tracking-wider">Civil & Structural Operations</p>
-              <p className="text-zinc-500 text-xs mt-4 italic max-w-xs leading-relaxed">
-                Overseeing structural foundation concrete, precision asphalt leveling, and international safety grading compliance.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-zinc-50 border border-zinc-200 rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center justify-center min-h-[260px] transition-all hover:border-emerald-500/30 group hover:shadow-md active:scale-[0.99]"
-            >
-              <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-emerald-600 mb-5 border border-zinc-200 group-hover:scale-105 transition-transform duration-300">
-                <Target className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-bold text-zinc-900 uppercase tracking-wide">Managing Director</h4>
-              <p className="text-emerald-600 text-xs font-mono mt-1.5 uppercase tracking-wider">Strategic Client Alliances</p>
-              <p className="text-zinc-500 text-xs mt-4 italic max-w-xs leading-relaxed">
-                Leading strategic expansion, client consultation workflows, and partnerships with national academies and schools.
-              </p>
-            </motion.div>
+            {founders.map((member, idx) => (
+              <motion.div 
+                key={member.id}
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="bg-zinc-50 border border-zinc-200 rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center justify-center min-h-[260px] transition-all hover:border-emerald-500/30 group hover:shadow-md active:scale-[0.99]"
+              >
+                <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-emerald-600 mb-5 border border-zinc-200 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                  {member.image ? (
+                    <img 
+                      src={member.image} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover" 
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <Users className="w-6 h-6" />
+                  )}
+                </div>
+                <h4 className="text-xl font-bold text-zinc-900 uppercase tracking-wide">{member.role}</h4>
+                <p className="text-emerald-600 text-xs font-mono mt-1.5 uppercase tracking-wider">{member.name}</p>
+                <p className="text-zinc-500 text-xs mt-4 italic max-w-xs leading-relaxed">
+                  {member.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
+
+          {others.length > 0 && (
+            <div className="mt-16 grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {others.map((member) => (
+                <motion.div 
+                  key={member.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-center hover:border-emerald-500/30 transition-all"
+                >
+                  <div className="w-12 h-12 bg-zinc-100 rounded-full mx-auto flex items-center justify-center text-emerald-600 mb-4 border border-zinc-200 overflow-hidden">
+                    {member.image ? (
+                      <img 
+                        src={member.image} 
+                        alt={member.name} 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <Target className="w-5 h-5" />
+                    )}
+                  </div>
+                  <h5 className="font-bold text-zinc-900 uppercase text-sm">{member.name}</h5>
+                  <p className="text-emerald-600 text-[10px] font-mono uppercase tracking-wider mb-2">{member.role}</p>
+                  <p className="text-zinc-500 text-[10px] italic leading-relaxed">
+                    {member.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Bottom Banner */}

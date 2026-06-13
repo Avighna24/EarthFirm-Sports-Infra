@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES } from '../constants';
 import { SportType, SurfaceMaterialType, SubbaseType } from '../types';
-import { saveDocument } from './firebase';
+import { saveToLocalRegistry } from '../lib/storage';
 
 // Import high-fidelity visual assets generated according to user specification
 import squashCourtImg from '../assets/images/squash_court_1780661148365.png';
@@ -200,7 +200,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
     setSubmissionCode(code);
 
     try {
-      await saveDocument('budget_rfps', code, {
+      saveToLocalRegistry('budget_rfps', {
         sportType: sportType,
         length: Number(length),
         width: Number(width),
@@ -213,7 +213,8 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ onBackToMain, lang
         location: location,
         timeline: timeline,
         projectTotalCost: Number(projectTotal),
-        submissionCode: code
+        submissionCode: code,
+        timestamp: new Date().toISOString()
       });
     } catch (err) {
       console.error('Error saving budget plan to Firestore:', err);

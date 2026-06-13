@@ -100,55 +100,65 @@ export function NavBar({ onNavigateHome, onNavigateTo, onScrollTo }: NavBarProps
 
       </div>
 
-      {/* Mobile Menu Dropdown with slide-down animation */}
+      {/* Mobile Menu Slide-out Sidebar */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="md:hidden overflow-hidden bg-black/95 backdrop-blur-2xl border-t border-white/5 mt-2 rounded-2xl"
-          >
-            <div className="flex flex-col gap-1 px-4 py-6 text-center">
-              <button
-                onClick={() => handleMobileRouteClick('/about-us')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                About Us
-              </button>
-              <button
-                onClick={() => handleNavClick('arena-configurator', '/')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                Interactive Customizer
-              </button>
-              <button
-                onClick={() => handleMobileRouteClick('/budget-planning')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                Budget Planning
-              </button>
-              <button
-                onClick={() => handleMobileRouteClick('/faq')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                FAQ
-              </button>
-              <button
-                onClick={() => handleMobileRouteClick('/careers')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                Careers
-              </button>
-              <button
-                onClick={() => handleNavClick('contact-operations', '/')}
-                className="w-full text-center py-3.5 text-sm font-bold tracking-widest uppercase text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition duration-200 cursor-pointer"
-              >
-                Contact Us
-              </button>
-            </div>
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm md:hidden z-[60]"
+            />
+            
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-[280px] bg-zinc-950 border-l border-white/10 z-[70] md:hidden flex flex-col"
+            >
+              <div className="p-6 flex justify-between items-center border-b border-white/5">
+                <span className="text-white font-serif font-bold uppercase tracking-wider text-sm">Navigation</span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 text-zinc-400 hover:text-white transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <nav className="flex-grow py-8 px-6 space-y-2">
+                {[
+                  { label: 'About Us', onClick: () => handleMobileRouteClick('/about-us') },
+                  { label: 'Interactive Customizer', onClick: () => handleNavClick('arena-configurator', '/') },
+                  { label: 'Budget Planning', onClick: () => handleMobileRouteClick('/budget-planning') },
+                  { label: 'FAQ', onClick: () => handleMobileRouteClick('/faq') },
+                  { label: 'Careers', onClick: () => handleMobileRouteClick('/careers') },
+                  { label: 'Contact Us', onClick: () => handleNavClick('contact-operations', '/') }
+                ].map((item, idx) => (
+                  <motion.button
+                    key={item.label}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + idx * 0.05 }}
+                    onClick={item.onClick}
+                    className="w-full text-left py-4 text-sm font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-brand-sage transition-colors border-b border-white/5"
+                  >
+                    {item.label}
+                  </motion.button>
+                ))}
+              </nav>
+
+              <div className="p-8 border-t border-white/5">
+                <img src="./Logo.png" alt="Earthfirm" className="h-16 w-auto object-contain mx-auto opacity-50 grayscale" />
+                <p className="text-[10px] text-zinc-600 font-mono text-center mt-4 uppercase tracking-widest">Constructing Excellence</p>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

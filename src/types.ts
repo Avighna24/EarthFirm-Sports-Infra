@@ -84,16 +84,78 @@ export interface EstimatorSummary {
   totalEstimatedCost: number;
 }
 
-export interface ProposalRequest {
-  config: CourtConfiguration;
-  costSummary: EstimatorSummary;
-  clientInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-    location: string;
-    intendedUse: 'Residential' | 'Commercial' | 'Educational' | 'Professional';
-    timeline: string;
-    additionalNotes: string;
-  };
+export interface Application {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  roleId: string;
+  roleTitle: string;
+  experienceYear: string;
+  coverLetter: string;
+  resumeFileName?: string;
+  resumeSize?: number;
+  resumeUrl?: string; // Holds base64 resume if available
+  timestamp: string;
+  isOffline?: boolean;
+}
+
+export interface ConsultLead {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  location: string;
+  sportType?: string;
+  source: 'interactive' | 'floating' | 'faq' | 'budget';
+  totalCost?: number;
+  additionalNotes?: string;
+  answers?: any; // for FAQ
+  organization?: string; // for FAQ
+  timeline?: string;
+  timestamp: string;
+  isOffline?: boolean;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  content: string;
+  stars: number;
+  image?: string;
+  date: string;
+}
+
+export interface Partner {
+  id: string;
+  name: string;
+  logo: string;
+  website?: string;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  type: 'FOUNDER' | 'ENGINEER' | 'ADMIN';
+}
+
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  location: string;
+  category: SportType;
+  image: string;
+  description: string;
+  year: string;
+}
+
+export interface CMSData {
+  testimonials: Testimonial[];
+  partners: Partner[];
+  portfolio: PortfolioItem[];
+  team: TeamMember[];
 }

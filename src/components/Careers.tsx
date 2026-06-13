@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Briefcase, MapPin, Clock, ArrowRight, X, Send, CheckCircle2, User, Mail, Phone, Calendar, UploadCloud, AlertCircle } from 'lucide-react';
-import { saveDocument } from './firebase';
 
 // OPTION C CONFIGURATION FOR GITHUB PAGES / STATIC HOSTING:
 // By default, static web hosting platforms (like GitHub Pages) do not run server-side Node.js code (server.ts).
@@ -221,7 +220,7 @@ export function Careers({ onBackToMain }: CareersProps) {
       coverLetter,
       resumeFileName: resumeFile.name,
       resumeFileType: resumeFile.type,
-      resumeBase64: base64Resume,
+      resumeUrl: base64Resume,
       timestamp: new Date().toISOString()
     };
 
@@ -240,12 +239,6 @@ export function Careers({ onBackToMain }: CareersProps) {
     };
 
     try {
-      try {
-        await saveDocument('job_applications', '', firestoreData);
-      } catch (fError) {
-        console.warn('Firestore write failed, proceeding with server-side email connection:', fError);
-      }
-
       // 2. Dispatch to custom backend API (or Formspree client-side fallback)
       try {
         const isStaticHost = window.location.hostname.includes('github.io') || window.location.hostname.includes('pages');
@@ -345,7 +338,7 @@ export function Careers({ onBackToMain }: CareersProps) {
       }
 
       // Instantly refresh list of applications on UI
-      const updatedList = [firestoreData, ...applications];
+      const updatedList = [appData, ...applications];
       setApplications(updatedList);
       localStorage.setItem('offline_job_applications', JSON.stringify(updatedList));
 

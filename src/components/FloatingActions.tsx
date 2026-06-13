@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, PhoneCall, Mail, Navigation, Calendar, X, CheckSquare, ShieldCheck, Sparkles, User, Phone, MapPin, Send } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
-import { saveDocument } from './firebase';
+import { saveToLocalRegistry } from '../lib/storage';
 
 interface FloatingActionsProps {
   onScrollToContact: (elementId: string) => void;
@@ -71,14 +71,16 @@ export function FloatingActions({ onScrollToContact }: FloatingActionsProps) {
       cachedCons.push(newEntry);
       localStorage.setItem('premium_consultations', JSON.stringify(cachedCons));
 
-      // Save securely to Cloud Firestore separately
-      await saveDocument('floating_consultations', bId, {
+      // Save securely to Local Storage
+      saveToLocalRegistry('floating_consultations', {
+        id: bId,
         fullName: formData.fullName,
         phone: formData.phone,
         email: formData.email,
         location: formData.location,
         sportType: formData.sportType,
-        notes: formData.notes
+        notes: formData.notes,
+        timestamp: new Date().toISOString()
       });
     }
   };

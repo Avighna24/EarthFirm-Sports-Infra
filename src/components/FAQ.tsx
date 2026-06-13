@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { saveDocument } from './firebase';
+import { saveToLocalRegistry } from '../lib/storage';
 
 // Import high-fidelity squash court visual asset
 import squashCourtImg from '../assets/images/squash_court_1780661148365.png';
@@ -187,13 +187,14 @@ export function FAQ({ onBackToMain }: FAQProps) {
     setIsSubmitting(true);
     const docId = `FAQ-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     try {
-      await saveDocument('faq_consultations', docId, {
+      saveToLocalRegistry('faq_consultations', {
         answers: answers,
         cityName: cityName || null,
         fullName: contactData.fullName,
         organization: contactData.organization || null,
         phone: contactData.phone,
-        email: contactData.email
+        email: contactData.email,
+        timestamp: new Date().toISOString()
       });
       setShowSuccessScreen(true);
     } catch (e) {

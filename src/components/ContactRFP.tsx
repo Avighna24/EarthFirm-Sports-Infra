@@ -8,7 +8,7 @@ import { CourtConfiguration } from '../types';
 import { SPORT_PRESETS, SURFACE_MATERIALS, SUB_BASES, SMART_FEATURES } from '../constants';
 import { Mail, Phone, MapPin, Sparkles, Clock, CheckCircle2, FileText, Download, Briefcase, Landmark } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-import { saveDocument } from './firebase';
+import { saveToLocalRegistry } from '../lib/storage';
 
 interface ContactRFPProps {
   config: CourtConfiguration;
@@ -60,7 +60,7 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
     setHashCode(code);
 
     try {
-      await saveDocument('interactive_consultations', code, {
+      saveToLocalRegistry('interactive_consultations', {
         sportType: config.sportType,
         length: Number(config.length),
         width: Number(config.width),
@@ -75,7 +75,8 @@ export const ContactRFP: React.FC<ContactRFPProps> = ({ config }) => {
         timeline: timeline,
         additionalNotes: additionalNotes || null,
         totalCost: Number(totalCost),
-        hashCode: code
+        hashCode: code,
+        timestamp: new Date().toISOString()
       });
     } catch (err) {
       console.error('Error saving interactive design RFP:', err);

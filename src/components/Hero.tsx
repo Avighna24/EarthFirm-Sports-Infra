@@ -136,11 +136,17 @@ export const Hero: React.FC<HeroProps> = ({ onStartCustomizer, onViewCatalog }) 
               animate={{ opacity: 0.9, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full bg-cover bg-center"
-              style={{
-                backgroundImage: `url('${currentSlide.image}')`,
-              }}
-            />
+              className="absolute inset-0 w-full h-full"
+            >
+              <img 
+                src={currentSlide.image} 
+                alt="" 
+                className="w-full h-full object-cover will-change-transform"
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
           </AnimatePresence>
           {/* High-quality static gradient overlay masks */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/70 z-5 pointer-events-none" />
