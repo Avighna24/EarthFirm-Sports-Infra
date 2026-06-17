@@ -26,6 +26,9 @@ var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
 var import_nodemailer = __toESM(require("nodemailer"), 1);
+var import_fs = __toESM(require("fs"), 1);
+var import_app = require("firebase/app");
+var import_firestore = require("firebase/firestore");
 async function startServer() {
   const app = (0, import_express.default)();
   const PORT = 3e3;
@@ -33,6 +36,176 @@ async function startServer() {
   app.use(import_express.default.urlencoded({ limit: "15mb", extended: true }));
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+  const DEFAULT_CMS_DATA = {
+    testimonials: [
+      {
+        id: "1",
+        name: "Rohan Sharma",
+        role: "Facilities Manager, Apex Sports Academy",
+        content: "Earthfirm delivered our multi-sport arena 2 weeks ahead of schedule. The quality of the Canadian Maple flooring is world-class.",
+        stars: 5,
+        date: "2024-03-15"
+      },
+      {
+        id: "2",
+        name: "Anita Desai",
+        role: "Director, Heritage International School",
+        content: "Their consultative approach to the swimming pool design was refreshing. They understood our safety requirements perfectly.",
+        stars: 5,
+        date: "2024-05-20"
+      }
+    ],
+    partners: [
+      { id: "1", name: "SportCourt Global", logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aba9?auto=format&fit=crop&q=80&w=200" },
+      { id: "2", name: "MapleTech surfaces", logo: "https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80&w=200" },
+      { id: "3", name: "Arena Lighting solutions", logo: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=200" }
+    ],
+    portfolio: [
+      {
+        id: "p1",
+        title: "The National Basketball Center",
+        location: "New Delhi",
+        category: "BASKETBALL",
+        image: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=800",
+        description: "A 4-court professional facility using FIBA Grade 1 Maple flooring.",
+        year: "2023"
+      },
+      {
+        id: "p2",
+        title: "Leela Sky Residency Pool",
+        location: "Mumbai",
+        category: "SWIMMING_POOL",
+        image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80&w=800",
+        description: "Olympic-sized infinity pool with automated filtration systems.",
+        year: "2022"
+      }
+    ],
+    team: [
+      {
+        id: "t1",
+        name: "Prakash Sharma",
+        role: "Technical Director",
+        description: "Overseeing structural foundation concrete, precision asphalt leveling, and international safety grading compliance.",
+        type: "FOUNDER"
+      },
+      {
+        id: "t2",
+        name: "Aditya Bhadoria",
+        role: "Managing Director",
+        description: "Leading strategic expansion, client consultation workflows, and partnerships with national academies and schools.",
+        type: "FOUNDER"
+      }
+    ]
+  };
+  let firestoreDb = null;
+  function getDb() {
+    if (firestoreDb) return firestoreDb;
+    const apiKey = process.env.FIREBASE_API_KEY;
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    if (apiKey && projectId) {
+      console.log("[CMS API] Initializing Firebase Firestore server-side with Project ID:", projectId);
+      try {
+        const firebaseConfig = {
+          apiKey,
+          authDomain: process.env.FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`,
+          projectId,
+          storageBucket: process.env.FIREBASE_STORAGE_BUCKET || `${projectId}.appspot.com`,
+          messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+          appId: process.env.FIREBASE_APP_ID
+        };
+        const app2 = (0, import_app.getApps)().length === 0 ? (0, import_app.initializeApp)(firebaseConfig) : (0, import_app.getApp)();
+        firestoreDb = (0, import_firestore.getFirestore)(app2);
+        return firestoreDb;
+      } catch (err) {
+        console.error("[CMS API] Failed to initialize Firebase app:", err);
+      }
+    }
+    return null;
+  }
+  async function loadCMSData() {
+    const db = getDb();
+    if (db) {
+      try {
+        const docRef = (0, import_firestore.doc)(db, "cms", "global");
+        const docSnap = await (0, import_firestore.getDoc)(docRef);
+        if (docSnap.exists()) {
+          console.log("[CMS API] Loaded CMS data from global Firestore storage.");
+          return docSnap.data();
+        } else {
+          console.log("[CMS API] Global Firestore document does not exist yet. Seeding default data.");
+          await (0, import_firestore.setDoc)(docRef, DEFAULT_CMS_DATA);
+          return DEFAULT_CMS_DATA;
+        }
+      } catch (err) {
+        console.error("[CMS API] Firestore read failed, falling back to local file path.", err);
+      }
+    }
+    const DATA_DIR = import_path.default.join(process.cwd(), "data");
+    const CMS_FILE = import_path.default.join(DATA_DIR, "cms_data.json");
+    try {
+      if (!import_fs.default.existsSync(DATA_DIR)) {
+        import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      if (!import_fs.default.existsSync(CMS_FILE)) {
+        import_fs.default.writeFileSync(CMS_FILE, JSON.stringify(DEFAULT_CMS_DATA, null, 2), "utf-8");
+        return DEFAULT_CMS_DATA;
+      }
+      const raw = import_fs.default.readFileSync(CMS_FILE, "utf-8");
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error("[CMS API] Local file read/write failed, returning memory fallback.", err);
+      return DEFAULT_CMS_DATA;
+    }
+  }
+  async function saveCMSDataToServer(data) {
+    const db = getDb();
+    if (db) {
+      try {
+        const docRef = (0, import_firestore.doc)(db, "cms", "global");
+        await (0, import_firestore.setDoc)(docRef, data);
+        console.log("[CMS API] Global Firestore document updated successfully.");
+        return true;
+      } catch (err) {
+        console.error("[CMS API] Firestore save failed, writing to local file path.", err);
+      }
+    }
+    const DATA_DIR = import_path.default.join(process.cwd(), "data");
+    const CMS_FILE = import_path.default.join(DATA_DIR, "cms_data.json");
+    try {
+      if (!import_fs.default.existsSync(DATA_DIR)) {
+        import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      import_fs.default.writeFileSync(CMS_FILE, JSON.stringify(data, null, 2), "utf-8");
+      return true;
+    } catch (err) {
+      console.error("[CMS API] Local file save failed:", err);
+      return false;
+    }
+  }
+  app.get("/api/cms", async (req, res) => {
+    try {
+      const data = await loadCMSData();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Failed to load CMS data" });
+    }
+  });
+  app.post("/api/cms", async (req, res) => {
+    try {
+      const data = req.body;
+      if (!data || typeof data !== "object") {
+        return res.status(400).json({ error: "Invalid CMS data structure received" });
+      }
+      const success = await saveCMSDataToServer(data);
+      if (success) {
+        res.json({ success: true, message: "CMS data synchronized globally" });
+      } else {
+        res.status(500).json({ error: "Failed to persist CMS data to server backend" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Failed to write CMS data" });
+    }
   });
   app.post("/api/careers/apply", async (req, res) => {
     const {
