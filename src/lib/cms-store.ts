@@ -82,9 +82,27 @@ export const getCMSData = (): CMSData => {
   return getInitialCMSData();
 };
 
-export const saveCMSData = (data: CMSData) => {
+export const saveCMSData = async (data: CMSData) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   window.dispatchEvent(new Event('earthfirm_cms_updated'));
+
+  try {
+    const res = await fetch('/api/cms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result && result.success) {
+      console.log('[CMS STORE] CMS data synchronized successfully with server.');
+    } else {
+      console.warn('[CMS STORE] Server failed to persist CMS data:', result.error);
+    }
+  } catch (err) {
+    console.error('[CMS STORE] Failed to sync CMS data with server API:', err);
+  }
 };
 
 export const useCMSData = () => {
@@ -94,6 +112,23 @@ export const useCMSData = () => {
   useEffect(() => {
     setData(getInitialCMSData());
 
+    // Fetch from global backend storage asynchronously
+    setLoading(true);
+    fetch('/api/cms')
+      .then(res => res.json())
+      .then(serverData => {
+        if (serverData && typeof serverData === 'object' && !serverData.error) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
+          setData(serverData);
+        }
+      })
+      .catch(err => {
+        console.warn('[CMS STORE] Failed to load server-side CMS data, utilizing local offline cache:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
         setData(getInitialCMSData());
@@ -102,9 +137,6 @@ export const useCMSData = () => {
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Also listen for custom events if we are updating within the same window 
-    // (though state updates in the same window usually handle this, 
-    // adding a trigger in saveCMSData is better)
     const handleLocalCmsUpdate = () => {
       setData(getInitialCMSData());
     };

@@ -174,6 +174,16 @@ export function AdminDashboard({ onBackToMain }: { onBackToMain: () => void }) {
 
     // Refresh CMS Data
     setCmsData(getInitialCMSData());
+    try {
+      const res = await fetch('/api/cms');
+      const serverCmsData = await res.json();
+      if (serverCmsData && typeof serverCmsData === 'object' && !serverCmsData.error) {
+        setCmsData(serverCmsData);
+        localStorage.setItem('earthfirm_cms_data', JSON.stringify(serverCmsData));
+      }
+    } catch (err) {
+      console.warn("Failed to update CMS data from server API root:", err);
+    }
 
     setApplications(appList);
     setConsultations(consultList);
